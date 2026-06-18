@@ -1,0 +1,53 @@
+name: Impedimento
+description: Use quando o grupo está travado e precisa de ajuda
+title: "[IMPEDIMENTO] Descreva o problema em uma frase"
+labels: ["tcc", "bloqueado"]
+body:
+  - type: input
+    id: grupo
+    attributes:
+      label: Grupo
+      placeholder: "ex: Grupo 01"
+    validations:
+      required: true
+
+  - type: input
+    id: responsavel
+    attributes:
+      label: Quem está relatando
+      placeholder: "Nome do integrante"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problema
+    attributes:
+      label: Qual é o problema
+      description: Descreva o que está travando o grupo
+      placeholder: "ex: Não conseguimos conectar o Flask ao banco SQLite — dá erro ao importar o repositorio.py"
+    validations:
+      required: true
+
+  - type: textarea
+    id: impacto
+    attributes:
+      label: O que isso está impedindo
+      placeholder: "ex: Sem isso não conseguimos avançar na tela de cadastro"
+    validations:
+      required: true
+
+  - type: textarea
+    id: tentativa
+    attributes:
+      label: O que já tentaram fazer
+      placeholder: "ex: Tentamos mover o arquivo, reinstalar o Flask, assistir ao vídeo da aula 3"
+    validations:
+      required: true
+
+  - type: textarea
+    id: ajuda
+    attributes:
+      label: Que tipo de ajuda precisam
+      placeholder: "ex: Precisamos que o professor explique como configurar o banco antes da próxima aula"
+    validations:
+      required: true

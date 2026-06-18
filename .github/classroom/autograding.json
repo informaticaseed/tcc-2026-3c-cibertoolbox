@@ -1,0 +1,44 @@
+{
+  "tests": [
+    {
+      "name": "Backlog preenchido",
+      "setup": "pip install pytest",
+      "run": "pytest tests/test_tcc_grupo.py::test_backlog_preenchido -v",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 60,
+      "points": 25
+    },
+    {
+      "name": "Grupo trabalhou esta semana",
+      "setup": "pip install pytest",
+      "run": "pytest tests/test_tcc_grupo.py::test_issue_aberta_esta_semana -v",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 60,
+      "points": 25
+    },
+    {
+      "name": "Participação individual",
+      "setup": "pip install pytest",
+      "run": "pytest tests/test_tcc_grupo.py::test_participacao_individual -v",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 60,
+      "points": 25
+    },
+    {
+      "name": "PR semanal entregue",
+      "setup": "pip install pytest",
+      "run": "pytest tests/test_tcc_grupo.py::test_pr_semanal -v",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 60,
+      "points": 25
+    }
+  ]
+}

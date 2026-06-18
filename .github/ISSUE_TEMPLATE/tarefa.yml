@@ -1,0 +1,81 @@
+name: Tarefa Semanal
+description: Use este modelo para registrar uma tarefa do backlog semanal
+title: "[Semana XX] Título da tarefa"
+labels: ["tcc", "tarefa"]
+body:
+  - type: input
+    id: grupo
+    attributes:
+      label: Grupo
+      placeholder: "ex: Grupo 01"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: turma
+    attributes:
+      label: Turma
+      options:
+        - 3A
+        - 3B
+        - 3C
+    validations:
+      required: true
+
+  - type: input
+    id: semana
+    attributes:
+      label: Semana
+      placeholder: "ex: Semana 04 — 25/05 a 29/05"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Tipo da tarefa
+      options:
+        - Funcionalidade
+        - Teste
+        - Documentação
+        - Refatoração
+        - Bug
+        - Outro
+    validations:
+      required: true
+
+  - type: input
+    id: responsavel
+    attributes:
+      label: Responsável
+      placeholder: "Nome do integrante que vai fazer"
+    validations:
+      required: true
+
+  - type: textarea
+    id: descricao
+    attributes:
+      label: O que será feito
+      description: Descreva a tarefa de forma clara e objetiva
+      placeholder: "ex: Criar a tela de cadastro de usuários com validação dos campos obrigatórios"
+    validations:
+      required: true
+
+  - type: textarea
+    id: pronto
+    attributes:
+      label: Critérios de pronto
+      description: Como saberemos que a tarefa está concluída?
+      value: |
+        - [ ] Implementado
+        - [ ] Testado manualmente
+        - [ ] Demonstrável
+        - [ ] Commitado no repositório
+    validations:
+      required: true
+
+  - type: textarea
+    id: impedimentos
+    attributes:
+      label: Impedimentos conhecidos
+      placeholder: "Nenhum / Descreva se há algo que pode travar essa tarefa"
