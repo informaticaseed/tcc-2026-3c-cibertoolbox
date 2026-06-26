@@ -7,8 +7,8 @@
 
 | Nome completo | GitHub | Turma |
 |--------------|--------|-------|
-| (Davi brasileiro) | @username | 3A |
-| (nome 2) | @username | 3A |
+| (Davi brasileiro) | @username | 3C|
+| (Vinícius Fernandes) | @username | 3C |
 | (nome 3) | @username | 3A |
 
 **Tema:** (escreva aqui em 1 frase)
