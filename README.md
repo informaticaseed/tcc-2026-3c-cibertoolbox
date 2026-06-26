@@ -1,4 +1,4 @@
-# TCC 2026 — [Nome do Grupo]
+# TCC 2026 — [Cibertoolbox]
 **LTP3 + QP3 · CEMIC 2026 · Prof. Rafael Martins Alves**
 
 --- 
@@ -9,16 +9,16 @@
 |--------------|--------|-------|
 | (Davi brasileiro) | @username | 3C|
 | (Vinícius Fernandes) | @username | 3C |
-| (nome 3) | @username | 3A |
+| (Arthur Feitosa Rodrigues dos Santos) | @arthurfeitosarod | 3C |
 
-**Tema:** (escreva aqui em 1 frase)
-**Tecnologia:** Python + Flask + SQLite
+**Tema:** (Cibertoolbox – multi-tool portátil open source (caixa de ferramentas) Software voltado para organização de ferramentas portáteis de cibersegurança, pensado para técnicos iniciantes que precisam de praticidade e eficiência.)
+**Tecnologia:** Python + CKT + SQLite + Diversas Bibliotecas como request, hashlib, 
 
 ---
 
 ## 🎯 O que o sistema faz
 
-(Descreva em 2-3 frases o problema que o sistema resolve e para quem)
+(Software multi-tool portátil open source voltado para cibersegurança, organiza ferramentas por classificações como ferramentas para Engenharia social, ou ferramentas para varreduras, e ferramentas OSINT.)
 
 ---
 
