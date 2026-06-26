@@ -9,7 +9,7 @@
 |--------------|--------|-------|
 | (Davi brasileiro) | @username | 3C|
 | (Vinícius Fernandes) | @username | 3C |
-| (Arthur Feitosa Rodrigues dos Santos) | @arthurfeitosarod | 3C |
+| (Arthur Feitosa Rodrigues dos Santos) | @arthurfeitosarod | 3C |eu sou dono
 
 **Tema:** (Cibertoolbox – multi-tool portátil open source (caixa de ferramentas) Software voltado para organização de ferramentas portáteis de cibersegurança, pensado para técnicos iniciantes que precisam de praticidade e eficiência.)
 **Tecnologia:** Python + CKT + SQLite + Diversas Bibliotecas como request, hashlib, 
