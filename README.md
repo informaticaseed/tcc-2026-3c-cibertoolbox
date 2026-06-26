@@ -1,13 +1,13 @@
 # TCC 2026 — [Nome do Grupo]
 **LTP3 + QP3 · CEMIC 2026 · Prof. Rafael Martins Alves**
 
----
+--- 
 
 ## 👥 Integrantes
 
 | Nome completo | GitHub | Turma |
 |--------------|--------|-------|
-| (nome 1) | @username | 3A |
+| (Davi brasileiro) | @username | 3A |
 | (nome 2) | @username | 3A |
 | (nome 3) | @username | 3A |
 
