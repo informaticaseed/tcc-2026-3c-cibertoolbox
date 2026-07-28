@@ -1,7 +1,6 @@
 # Acompanhamento Quinzenal — Prof. Rafael
-**Grupo:** [Nome do Grupo]
-**Turma:** 3A / 3B / 3C
-**Repositório:** [link]
+**Grupo:** CIBERTOOLBOX
+**Turma:** 3C
 
 ---
 
@@ -11,9 +10,10 @@
 
 | Integrante | O que se comprometeu a fazer |
 |-----------|------------------------------|
-| (nome 1) | |
-| (nome 2) | |
-| (nome 3) | |
+| Arthur | Sistema de ferramentas, sistema de configuração|
+| Davi | Landing page|
+| Vinícius | Documentação: fundamentação teórica, metodologia, hipótese e perguntas norteadoras|
+| Natan | Teste do sistema e revisão do documento e da landing page|
 
 ### Verificação em 08/08
 
