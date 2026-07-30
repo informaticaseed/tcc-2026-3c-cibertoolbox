@@ -1,0 +1,36 @@
+feitos pesquisa Definição de tema, Verificar viabilidade, Levantamento de Requisitos, 
+
+(problema): Inexistência de software que ofereça variedade de ferramentas e recursos voltados para segurança cibernética em um único ambiente, dificultando a vida de técnicos iniciantes que precisam recorrer a soluções dispersas.
+
+(Ideia Principal):
+Manutenção simplificada
+Redução de custos
+Integração de múltiplas funções
+Contribuição da comunidade open source
+Reunir ferramentas dispersas
+Eficiência em auditorias
+
+///Portabilidade Manutenção simplificada, Redução de custos, Integração de múltiplas funções, Contribuição da comunidade open source e reunir ferramentas dispersas, focando em eficiência e manutenção por ser um software codigo aberto além da portabilidade  
+
+(Tema): Cibertoolbox – multi-tool portátil open source (caixa de ferramentas) Software voltado para organização de ferramentas portáteis de cibersegurança, pensado para técnicos iniciantes que precisam de praticidade e eficiência.
+
+(Justificativa):A fragmentação atual de ferramentas gera ineficiência e custos elevados.
+Técnicos iniciantes enfrentam barreiras de acesso por falta de soluções integradas.
+Um software open source permite colaboração comunitária, atualização constante e adaptação às novas ameaças.
+A portabilidade garante que auditorias possam ser feitas em campo com rapidez e menor complexidade logística.
+
+(Objetivos)
+Geral: Desenvolver um software multi-tool open source que centralize ferramentas de cibersegurança em um ambiente portátil e acessível.
+
+(Específicos):
+Integrar funções dispersas em uma única plataforma.
+Reduzir custos de auditoria e treinamento.
+Facilitar manutenção e atualização via comunidade open source.
+Oferecer uma solução prática para técnicos iniciantes.
+
+Ferramentas mult-tools para embasar:
+Microsoft PowerToys Fonte: Microsoft Learn (learn.microsoft.com in Bing)
+Ninite https://ninite.com/?utm_source=copilot.com
+Android MultiTool https://www.softradar.com/android-multitool/
+SteavenToolBox "https://github.com/SteavenToolBox/Windows"
+Ghost Toolbox https://github.com/ovsky/ghost-open-toolbox?utm_source=copilot.com
