@@ -1,11 +1,11 @@
 class Verification:
+
     def __init__(self):
-        # Dados do "banco de dados" ou mockados
-        self.__user__ = "ADMIN"
-        self.__senha__ = "ADMIN"
+        self.__user = "ADMIN"
+        self.__senha = "admin"
 
     def checar_credenciais(self, usuario, senha):
-        # Lógica pura de validação
-        if usuario == self.__user__ and senha == self.__senha__:
-            return True
-        return False
+        return (
+            usuario == self.__user
+            and senha == self.__senha
+        )

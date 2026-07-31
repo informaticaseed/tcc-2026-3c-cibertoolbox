@@ -1,38 +1,47 @@
 import customtkinter as ctk
+from tkinter import messagebox
+
 from src.Models.Validação import Verification
-import time
+from src.Views.main_window import ClientView
+
+
 class Auth_validacao:
-    #Transformando por padrão a classe eum classe inteira sem o instanciamento
+
     @classmethod
     def validar_login(cls, user, pwd):
-        print("="*20)
-        print("LOG DE LOGIN")
-        print("="*20)
-        
-        # Instanciamos o model diretamente aqui dentro para a lógica funcionar
-        model_validador = Verification()
-        
-        # Captura e trata os dados dos inputs da View
+        # Captura os valores digitados na interface.
         usuario = user.get().strip().upper()
-        senha = pwd.get().strip().upper()
-        
-        print(f"User: {usuario}\nSenha: {senha}")
-        
-        # O IF da validação chamando o Model
+
+        # A senha não deve receber upper() nem strip().
+        senha = pwd.get()
+
+        # Verifica se os campos estão vazios.
+        if not usuario or not senha:
+            messagebox.showwarning(
+                "Campos obrigatórios",
+                "Informe o usuário e a senha."
+            )
+            return
+
+        model_validador = Verification()
+
         if model_validador.checar_credenciais(usuario, senha):
-            print("Login Válido!")
-            print("="*20)
-            for i in range(10):
-                pontos = "." * (i % 4)
-                print(f"\rInicializando Tela principal{pontos:<3}", end="", flush=True)
-                time.sleep(0.4)
-            print("\nConcluído!")
-            print("="*20)
-            from src.Views.main_window import ClientView
+            messagebox.showinfo(
+                "Login realizado",
+                "Acesso autorizado."
+            )
+
             janela_login = user.winfo_toplevel()
             janela_login.withdraw()
-            main_app = ClientView()
-            main_app.mainloop()
-            
+
+            ClientView(janela_login)
+
         else:
-            print("Login Inválido! Acesso negado.")
+            messagebox.showerror(
+                "Acesso negado",
+                "Usuário ou senha inválidos."
+            )
+
+            # Apaga apenas a senha.
+            pwd.delete(0, ctk.END)
+            pwd.focus()
