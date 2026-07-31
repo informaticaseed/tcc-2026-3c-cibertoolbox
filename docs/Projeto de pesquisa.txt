@@ -1,4 +1,5 @@
 feitos pesquisa Definição de tema, Verificar viabilidade, Levantamento de Requisitos, 
+metodologia = Pesquisa Bibliografica
 
 (problema): Inexistência de software que ofereça variedade de ferramentas e recursos voltados para segurança cibernética em um único ambiente, dificultando a vida de técnicos iniciantes que precisam recorrer a soluções dispersas.
 
