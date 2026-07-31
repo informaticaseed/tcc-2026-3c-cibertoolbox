@@ -1,22 +1,13 @@
-import math
-
 import customtkinter as ctk
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image, ImageDraw, ImageEnhance, ImageOps
 
 from config import (
     BG_DARK,
     BG_SECONDARY,
-    BG_CARD,
-    BUTTON_DARK,
-    BUTTON_HOVER,
-    RED_MAIN,
-    RED_DARK,
-    RED_GLOW,
-    ORANGE_MAIN,
-    ORANGE_LIGHT,
     TEXT_LIGHT,
     TEXT_SECONDARY,
     GREEN_STATUS,
+    RED_MAIN,
     BORDER_DARK,
     MASCOTE_PRINCIPAL,
     ICON_FERRAMENTAS,
@@ -29,8 +20,9 @@ class ClientView(ctk.CTkToplevel):
     """
     Tela principal do CiberToolBox.
 
-    A tela utiliza CTkToplevel porque a janela de login já é
-    a janela principal da aplicação.
+    O mascote e os três ícones funcionam como botões.
+    Não são utilizados frames como moldura, evitando fundos
+    quadrados e círculos deformados.
     """
 
     def __init__(self, janela_login):
@@ -40,12 +32,10 @@ class ClientView(ctk.CTkToplevel):
 
         self.menu_aberto = False
         self.animacao_em_execucao = False
-        self.pulsacao_ativa = True
-        self.pulsacao_passo = 0
 
         self.title("CiberToolBox")
         self.geometry("1366x768")
-        self.minsize(1100, 680)
+        self.minsize(1050, 650)
         self.configure(fg_color=BG_DARK)
 
         try:
@@ -55,64 +45,81 @@ class ClientView(ctk.CTkToplevel):
 
         self.protocol(
             "WM_DELETE_WINDOW",
-            self.fechar_programa
+            self.fechar_programa,
         )
 
         self.carregar_imagens()
         self.criar_layout()
-        self.iniciar_pulsacao()
 
     # ========================================================
-    # IMAGENS
+    # CARREGAMENTO DAS IMAGENS
     # ========================================================
 
-    def carregar_imagem_circular(
+    def preparar_imagem_circular(
         self,
         caminho,
         tamanho,
-        margem=0,
+        zoom=1.0,
+        deslocamento_x=0,
+        deslocamento_y=0,
     ):
         """
-        Carrega qualquer imagem e aplica um recorte circular.
+        Prepara uma imagem circular e permite movimentar o conteúdo
+        dentro da área do botão.
 
-        Isso elimina o fundo quadrado visual, mesmo quando
-        a imagem original não possui transparência.
+        deslocamento_x:
+            valor positivo  -> move para a direita
+            valor negativo  -> move para a esquerda
+
+        deslocamento_y:
+            valor positivo  -> move para baixo
+            valor negativo  -> move para cima
         """
 
         try:
             imagem = Image.open(caminho).convert("RGBA")
 
-            largura, altura = tamanho
+            # Recorta a imagem original em formato quadrado.
+            lado = min(imagem.width, imagem.height)
 
-            tamanho_quadrado = min(
-                imagem.width,
-                imagem.height
+            esquerda = (imagem.width - lado) // 2
+            topo = (imagem.height - lado) // 2
+
+            imagem = imagem.crop(
+                (
+                    esquerda,
+                    topo,
+                    esquerda + lado,
+                    topo + lado,
+                )
             )
 
+            # O zoom aproxima o conteúdo sem alterar o botão.
+            if zoom > 1:
+                novo_lado = int(lado / zoom)
+                margem = (lado - novo_lado) // 2
+
+                imagem = imagem.crop(
+                    (
+                        margem,
+                        margem,
+                        margem + novo_lado,
+                        margem + novo_lado,
+                    )
+                )
+
+            # Redimensiona o desenho para o tamanho definido.
             imagem = ImageOps.fit(
                 imagem,
-                (
-                    tamanho_quadrado,
-                    tamanho_quadrado,
-                ),
+                tamanho,
                 method=Image.Resampling.LANCZOS,
                 centering=(0.5, 0.5),
             )
 
-            imagem = imagem.resize(
-                (
-                    largura,
-                    altura,
-                ),
-                Image.Resampling.LANCZOS,
-            )
-
+            # Cria a máscara circular.
             mascara = Image.new(
                 "L",
-                (
-                    largura,
-                    altura,
-                ),
+                tamanho,
                 0,
             )
 
@@ -120,83 +127,171 @@ class ClientView(ctk.CTkToplevel):
 
             desenho.ellipse(
                 (
-                    margem,
-                    margem,
-                    largura - margem,
-                    altura - margem,
+                    0,
+                    0,
+                    tamanho[0] - 1,
+                    tamanho[1] - 1,
                 ),
                 fill=255,
             )
 
             imagem.putalpha(mascara)
 
-            return ctk.CTkImage(
-                light_image=imagem,
-                dark_image=imagem,
-                size=tamanho,
+            # Cria uma área transparente do mesmo tamanho.
+            tela_transparente = Image.new(
+                "RGBA",
+                tamanho,
+                (0, 0, 0, 0),
             )
+
+            # Cola a imagem deslocada dentro dessa área.
+            tela_transparente.alpha_composite(
+                imagem,
+                dest=(
+                    deslocamento_x,
+                    deslocamento_y,
+                ),
+            )
+
+            return tela_transparente
 
         except (FileNotFoundError, OSError) as erro:
             print(
-                f"Não foi possível carregar a imagem "
-                f"{caminho}: {erro}"
+                f"Erro ao carregar a imagem '{caminho}': {erro}"
             )
             return None
 
-    def carregar_imagem_transparente(
+    def criar_ctk_image(
         self,
         caminho,
         tamanho,
+        zoom=1.0,
+        brilho=1.0,
+        deslocamento_x=0,
+        deslocamento_y=0,
     ):
-        """
-        Carrega um PNG transparente sem aplicar recorte.
-        """
+        imagem = self.preparar_imagem_circular(
+            caminho=caminho,
+            tamanho=tamanho,
+            zoom=zoom,
+            deslocamento_x=deslocamento_x,
+            deslocamento_y=deslocamento_y,
+        )
 
-        try:
-            imagem = Image.open(caminho).convert("RGBA")
-
-            return ctk.CTkImage(
-                light_image=imagem,
-                dark_image=imagem,
-                size=tamanho,
-            )
-
-        except (FileNotFoundError, OSError) as erro:
-            print(
-                f"Não foi possível carregar a imagem "
-                f"{caminho}: {erro}"
-            )
+        if imagem is None:
             return None
 
+        if brilho != 1.0:
+            canal_alpha = imagem.getchannel("A")
+
+            imagem_rgb = imagem.convert("RGB")
+
+            imagem_rgb = ImageEnhance.Brightness(
+                imagem_rgb
+            ).enhance(brilho)
+
+            imagem_rgb.putalpha(canal_alpha)
+            imagem = imagem_rgb
+
+        return ctk.CTkImage(
+            light_image=imagem,
+            dark_image=imagem,
+            size=tamanho,
+        )
+
     def carregar_imagens(self):
-        self.mascote_img = self.carregar_imagem_circular(
+    # ========================================================
+    # MASCOTE
+    # ========================================================
+
+        self.mascote_normal = self.criar_ctk_image(
             MASCOTE_PRINCIPAL,
-            (300, 300),
-            margem=3,
+            tamanho=(255, 255),
+            zoom=1.95,
+            brilho=1.0,
+
+            # Posição da imagem dentro do botão:
+            deslocamento_x=0,
+            deslocamento_y=-2,
         )
 
-        # Os ícones também recebem recorte circular.
-        # Isso evita o quadrado de fundo das imagens.
-        self.icon_ferramentas = self.carregar_imagem_circular(
+        self.mascote_hover = self.criar_ctk_image(
+            MASCOTE_PRINCIPAL,
+            tamanho=(285, 285),
+            zoom=2.0,
+            brilho=1.10,
+            deslocamento_x=0,
+            deslocamento_y=7,
+        )
+
+        # ========================================================
+        # FERRAMENTAS
+        # ========================================================
+
+        self.ferramentas_normal = self.criar_ctk_image(
             ICON_FERRAMENTAS,
-            (68, 68),
-            margem=3,
+            tamanho=(135, 140),
+            zoom=1.25,
+            brilho=1.0,
+            deslocamento_x=0,
+            deslocamento_y=-4,
         )
 
-        self.icon_servicos = self.carregar_imagem_circular(
+        self.ferramentas_hover = self.criar_ctk_image(
+            ICON_FERRAMENTAS,
+            tamanho=(140, 140),
+            zoom=1.55,
+            brilho=1.12,
+            deslocamento_x=0,
+            deslocamento_y=-4,
+        )
+
+        # ========================================================
+        # SERVIÇOS
+        # ========================================================
+
+        self.servicos_normal = self.criar_ctk_image(
             ICON_SERVICOS,
-            (68, 68),
-            margem=3,
+            tamanho=(135, 135),
+            zoom=1.25,
+            brilho=1.0,
+            deslocamento_x=0,
+            deslocamento_y=-3,
         )
 
-        self.icon_configuracoes = self.carregar_imagem_circular(
+        self.servicos_hover = self.criar_ctk_image(
+            ICON_SERVICOS,
+            tamanho=(140, 140),
+            zoom=1.55,
+            brilho=1.12,
+            deslocamento_x=0,
+            deslocamento_y=-3,
+        )
+
+        # ========================================================
+        # CONFIGURAÇÕES
+        # ========================================================
+
+        self.configuracoes_normal = self.criar_ctk_image(
             ICON_CONFIGURACOES,
-            (68, 68),
-            margem=3,
+            tamanho=(135, 135),
+            zoom=1.25,
+            brilho=1.0,
+            deslocamento_x=0,
+            deslocamento_y=-2,
+        )
+
+        self.configuracoes_hover = self.criar_ctk_image(
+            ICON_CONFIGURACOES,
+            tamanho=(140, 140),
+            zoom=1.55,
+            brilho=1.12,
+            deslocamento_x=0,
+            deslocamento_y=-2,
         )
 
     # ========================================================
-    # LAYOUT GERAL
+    # LAYOUT PRINCIPAL
     # ========================================================
 
     def criar_layout(self):
@@ -208,7 +303,7 @@ class ClientView(ctk.CTkToplevel):
         self.criar_barra_inferior()
 
     def criar_barra_superior(self):
-        self.barra_superior = ctk.CTkFrame(
+        barra = ctk.CTkFrame(
             self,
             height=70,
             corner_radius=0,
@@ -216,38 +311,35 @@ class ClientView(ctk.CTkToplevel):
             border_width=1,
             border_color=BORDER_DARK,
         )
-        self.barra_superior.grid(
+        barra.grid(
             row=0,
             column=0,
             sticky="ew",
         )
 
-        self.barra_superior.grid_columnconfigure(
-            1,
-            weight=1,
-        )
+        barra.grid_columnconfigure(1, weight=1)
 
-        simbolo_logo = ctk.CTkLabel(
-            self.barra_superior,
+        simbolo = ctk.CTkLabel(
+            barra,
             text="▣",
-            font=("Arial", 22, "bold"),
+            font=("Arial", 21, "bold"),
             text_color=RED_MAIN,
             width=35,
         )
-        simbolo_logo.grid(
+        simbolo.grid(
             row=0,
             column=0,
             padx=(28, 5),
             pady=16,
         )
 
-        titulo_logo = ctk.CTkLabel(
-            self.barra_superior,
+        nome = ctk.CTkLabel(
+            barra,
             text="CiberToolBox",
             font=("Arial", 19, "bold"),
             text_color=TEXT_LIGHT,
         )
-        titulo_logo.grid(
+        nome.grid(
             row=0,
             column=1,
             sticky="w",
@@ -255,11 +347,11 @@ class ClientView(ctk.CTkToplevel):
         )
 
         status = ctk.CTkLabel(
-            self.barra_superior,
+            barra,
             text="●  Sistema protegido",
             font=("Arial", 13),
             text_color=GREEN_STATUS,
-            fg_color=BG_CARD,
+            fg_color="#171C24",
             corner_radius=18,
             padx=18,
             pady=8,
@@ -283,14 +375,8 @@ class ClientView(ctk.CTkToplevel):
             sticky="nsew",
         )
 
-        self.conteudo.grid_rowconfigure(
-            1,
-            weight=1,
-        )
-        self.conteudo.grid_columnconfigure(
-            0,
-            weight=1,
-        )
+        self.conteudo.grid_rowconfigure(1, weight=1)
+        self.conteudo.grid_columnconfigure(0, weight=1)
 
         self.criar_cabecalho()
         self.criar_area_interativa()
@@ -304,7 +390,7 @@ class ClientView(ctk.CTkToplevel):
             row=0,
             column=0,
             sticky="ew",
-            pady=(25, 5),
+            pady=(20, 0),
         )
 
         titulo = ctk.CTkLabel(
@@ -317,73 +403,49 @@ class ClientView(ctk.CTkToplevel):
 
         subtitulo = ctk.CTkLabel(
             cabecalho,
-            text=(
-                "Seu kit de ferramentas para "
-                "um mundo mais seguro."
-            ),
+            text="Seu kit de ferramentas para um mundo mais seguro.",
             font=("Arial", 14),
             text_color=TEXT_SECONDARY,
         )
-        subtitulo.pack(pady=(6, 0))
+        subtitulo.pack(pady=(5, 0))
 
     def criar_area_interativa(self):
         self.area_interativa = ctk.CTkFrame(
             self.conteudo,
             fg_color="transparent",
-            height=530,
         )
         self.area_interativa.grid(
             row=1,
             column=0,
             sticky="nsew",
-            padx=30,
-            pady=(0, 10),
+            padx=25,
+            pady=(5, 0),
         )
 
-        self.area_interativa.grid_propagate(False)
-
-        self.criar_aneis_decorativos()
         self.criar_mascote()
-        self.criar_botoes_animados()
-
-        self.instrucao = ctk.CTkLabel(
-            self.area_interativa,
-            text="Clique no mascote para abrir o menu",
-            font=("Arial", 13),
-            text_color=TEXT_SECONDARY,
-        )
-        self.instrucao.place(
-            relx=0.5,
-            rely=0.95,
-            anchor="center",
-        )
+        self.criar_botoes_menu()
+        self.criar_instrucao()
 
     def criar_barra_inferior(self):
-        self.barra_inferior = ctk.CTkFrame(
+        barra = ctk.CTkFrame(
             self,
-            height=58,
+            height=55,
             corner_radius=0,
             fg_color=BG_SECONDARY,
             border_width=1,
             border_color=BORDER_DARK,
         )
-        self.barra_inferior.grid(
+        barra.grid(
             row=2,
             column=0,
             sticky="ew",
         )
 
-        self.barra_inferior.grid_columnconfigure(
-            0,
-            weight=1,
-        )
+        barra.grid_columnconfigure(0, weight=1)
 
         mensagem = ctk.CTkLabel(
-            self.barra_inferior,
-            text=(
-                "◇  Pronto para proteger. "
-                "Pronto para explorar."
-            ),
+            barra,
+            text="◇  Pronto para proteger. Pronto para explorar.",
             font=("Arial", 13),
             text_color=TEXT_SECONDARY,
         )
@@ -392,11 +454,11 @@ class ClientView(ctk.CTkToplevel):
             column=0,
             sticky="w",
             padx=28,
-            pady=17,
+            pady=15,
         )
 
         versao = ctk.CTkLabel(
-            self.barra_inferior,
+            barra,
             text="v0.2.0",
             font=("Consolas", 12),
             text_color=TEXT_SECONDARY,
@@ -405,174 +467,188 @@ class ClientView(ctk.CTkToplevel):
             row=0,
             column=1,
             padx=28,
-            pady=17,
+            pady=15,
         )
 
     # ========================================================
     # MASCOTE
     # ========================================================
 
-    def criar_aneis_decorativos(self):
-        self.anel_luz = ctk.CTkFrame(
-            self.area_interativa,
-            width=390,
-            height=390,
-            corner_radius=195,
-            fg_color=RED_DARK,
-        )
-        self.anel_luz.place(
-            relx=0.5,
-            rely=0.50,
-            anchor="center",
-        )
-
-        self.anel_externo = ctk.CTkFrame(
-            self.anel_luz,
-            width=375,
-            height=375,
-            corner_radius=187,
-            fg_color=RED_MAIN,
-        )
-        self.anel_externo.place(
-            relx=0.5,
-            rely=0.5,
-            anchor="center",
-        )
-
-        self.anel_medio = ctk.CTkFrame(
-            self.anel_externo,
-            width=359,
-            height=359,
-            corner_radius=179,
-            fg_color="#272D35",
-        )
-        self.anel_medio.place(
-            relx=0.5,
-            rely=0.5,
-            anchor="center",
-        )
-
-        self.anel_interno = ctk.CTkFrame(
-            self.anel_medio,
-            width=340,
-            height=340,
-            corner_radius=170,
-            fg_color=BG_CARD,
-        )
-        self.anel_interno.place(
-            relx=0.5,
-            rely=0.5,
-            anchor="center",
-        )
-
     def criar_mascote(self):
-        if self.mascote_img is not None:
-            self.botao_mascote = ctk.CTkButton(
-                self.anel_interno,
-                text="",
-                image=self.mascote_img,
-                width=320,
-                height=320,
-                corner_radius=160,
-                fg_color="transparent",
-                hover_color="#222833",
-                border_width=0,
-                command=self.alternar_menu,
-            )
-        else:
-            self.botao_mascote = ctk.CTkButton(
-                self.anel_interno,
-                text="MASCOTE\n\nClique aqui",
-                width=320,
-                height=320,
-                corner_radius=160,
-                fg_color=BG_CARD,
-                hover_color="#222833",
-                text_color=ORANGE_LIGHT,
-                font=("Arial", 20, "bold"),
-                command=self.alternar_menu,
-            )
+        self.botao_mascote = ctk.CTkButton(
+            self.area_interativa,
+            text="",
+            image=self.mascote_normal,
+            width=255,
+            height=255,
+            corner_radius=0,
+            fg_color="transparent",
+            hover_color=BG_DARK,
+            border_width=0,
+            command=self.alternar_menu,
+        )
 
         self.botao_mascote.place(
             relx=0.5,
-            rely=0.5,
+            rely=0.30,
             anchor="center",
         )
 
+        self.botao_mascote.bind(
+            "<Enter>",
+            lambda evento: self.mascote_entrou(),
+        )
+
+        self.botao_mascote.bind(
+            "<Leave>",
+            lambda evento: self.mascote_saiu(),
+        )
+
+    def mascote_entrou(self):
+        if self.mascote_hover is not None:
+            self.botao_mascote.configure(
+                image=self.mascote_hover
+            )
+
+    def mascote_saiu(self):
+        if self.mascote_normal is not None:
+            self.botao_mascote.configure(
+                image=self.mascote_normal
+            )
+
     # ========================================================
-    # BOTÕES CIRCULARES
+    # BOTÕES COM IMAGEM INTEIRA
     # ========================================================
 
-    def criar_botao_circular(
+    def criar_botao_imagem(
         self,
-        imagem,
-        texto,
+        imagem_normal,
+        imagem_hover,
         comando,
     ):
-        """
-        Cria um botão realmente circular.
-
-        Como largura e altura são iguais, o corner_radius
-        deve ser exatamente a metade.
-        """
-
-        return ctk.CTkButton(
+        botao = ctk.CTkButton(
             self.area_interativa,
-            text=texto,
-            image=imagem,
-            compound="top",
-            width=170,
-            height=170,
-            corner_radius=85,
-            fg_color=BUTTON_DARK,
-            hover_color=BUTTON_HOVER,
-            border_width=4,
-            border_color=RED_MAIN,
-            text_color=TEXT_LIGHT,
-            font=("Arial", 15, "bold"),
+            text="",
+            image=imagem_normal,
+            width=145,
+            height=145,
+            corner_radius=0,
+            fg_color="transparent",
+            hover_color=BG_DARK,
+            border_width=0,
             command=comando,
         )
 
-    def criar_botoes_animados(self):
-        self.botao_ferramentas = self.criar_botao_circular(
-            self.icon_ferramentas,
-            "Ferramentas",
+        botao.bind(
+            "<Enter>",
+            lambda evento: botao.configure(
+                image=imagem_hover
+            ),
+        )
+
+        botao.bind(
+            "<Leave>",
+            lambda evento: botao.configure(
+                image=imagem_normal
+            ),
+        )
+
+        return botao
+
+    def criar_botoes_menu(self):
+        self.botao_ferramentas = self.criar_botao_imagem(
+            self.ferramentas_normal,
+            self.ferramentas_hover,
             self.abrir_ferramentas,
         )
 
-        self.botao_servicos = self.criar_botao_circular(
-            self.icon_servicos,
-            "Serviços",
+        self.botao_servicos = self.criar_botao_imagem(
+            self.servicos_normal,
+            self.servicos_hover,
             self.abrir_servicos,
         )
 
-        self.botao_configuracoes = self.criar_botao_circular(
-            self.icon_configuracoes,
-            "Configurações",
+        self.botao_configuracoes = self.criar_botao_imagem(
+            self.configuracoes_normal,
+            self.configuracoes_hover,
             self.abrir_configuracoes,
         )
 
-        self.botoes_animados = {
+        self.label_ferramentas = self.criar_nome_botao(
+            "Ferramentas"
+        )
+
+        self.label_servicos = self.criar_nome_botao(
+            "Serviços"
+        )
+
+        self.label_configuracoes = self.criar_nome_botao(
+            "Configurações"
+        )
+
+        self.elementos_animados = {
             self.botao_ferramentas: {
-                "destino": (0.23, 0.50),
+                "origem": (0.5, 0.46),
+                "destino": (0.28, 0.46),
             },
+            self.label_ferramentas: {
+                "origem": (0.5, 0.46),
+                "destino": (0.28, 0.64),
+            },
+
             self.botao_servicos: {
-                "destino": (0.77, 0.50),
+                "origem": (0.5, 0.46),
+                "destino": (0.72, 0.46),
             },
+            self.label_servicos: {
+                "origem": (0.5, 0.46),
+                "destino": (0.72, 0.64),
+            },
+
             self.botao_configuracoes: {
-                "destino": (0.50, 0.86),
+                "origem": (0.5, 0.46),
+                "destino": (0.5, 0.76),
+            },
+            self.label_configuracoes: {
+                "origem": (0.5, 0.46),
+                "destino": (0.5, 0.91),
             },
         }
 
-        for botao in self.botoes_animados:
-            botao.place(
-                relx=0.5,
-                rely=0.50,
+        for elemento, dados in self.elementos_animados.items():
+            origem_x, origem_y = dados["origem"]
+
+            elemento.place(
+                relx=origem_x,
+                rely=origem_y,
                 anchor="center",
             )
-            botao.lower()
 
-        self.anel_luz.lift()
+            elemento.lower()
+
+        self.botao_mascote.lift()
+
+    def criar_nome_botao(self, texto):
+        return ctk.CTkLabel(
+            self.area_interativa,
+            text=texto,
+            font=("Arial", 15, "bold"),
+            text_color=TEXT_LIGHT,
+            fg_color="transparent",
+        )
+
+    def criar_instrucao(self):
+        self.instrucao = ctk.CTkLabel(
+            self.area_interativa,
+            text="Clique no mascote para abrir o menu",
+            font=("Arial", 13),
+            text_color=TEXT_SECONDARY,
+        )
+        self.instrucao.place(
+            relx=0.5,
+            rely=0.97,
+            anchor="center",
+        )
 
     # ========================================================
     # ANIMAÇÃO
@@ -592,52 +668,47 @@ class ClientView(ctk.CTkToplevel):
         self.animacao_em_execucao = True
 
         self.instrucao.configure(
-            text=(
-                "Selecione uma opção ou clique "
-                "novamente no mascote"
-            )
+            text="Escolha uma opção ou clique novamente no mascote"
         )
 
-        for botao in self.botoes_animados:
-            botao.lift()
+        for elemento in self.elementos_animados:
+            elemento.lift()
 
-        self.anel_luz.lift()
+        self.botao_mascote.lift()
 
-        self.animar_botoes(
+        self.animar_elementos(
             abrindo=True,
             passo=0,
-            total_passos=24,
+            total_passos=22,
         )
 
     def fechar_menu(self):
         self.menu_aberto = False
         self.animacao_em_execucao = True
 
-        self.animar_botoes(
+        self.animar_elementos(
             abrindo=False,
             passo=0,
-            total_passos=24,
+            total_passos=22,
         )
 
-    def animar_botoes(
+    def animar_elementos(
         self,
         abrindo,
         passo,
         total_passos,
     ):
-        origem_x = 0.5
-        origem_y = 0.50
-
         progresso = passo / total_passos
 
-        # Curva de suavização.
+        # Curva suave de aceleração e desaceleração.
         progresso_suave = (
             progresso
             * progresso
             * (3 - 2 * progresso)
         )
 
-        for botao, dados in self.botoes_animados.items():
+        for elemento, dados in self.elementos_animados.items():
+            origem_x, origem_y = dados["origem"]
             destino_x, destino_y = dados["destino"]
 
             if abrindo:
@@ -648,7 +719,6 @@ class ClientView(ctk.CTkToplevel):
                 y = origem_y + (
                     destino_y - origem_y
                 ) * progresso_suave
-
             else:
                 x = destino_x + (
                     origem_x - destino_x
@@ -658,16 +728,18 @@ class ClientView(ctk.CTkToplevel):
                     origem_y - destino_y
                 ) * progresso_suave
 
-            botao.place(
+            elemento.place(
                 relx=x,
                 rely=y,
                 anchor="center",
             )
 
+        self.botao_mascote.lift()
+
         if passo < total_passos:
             self.after(
-                15,
-                lambda: self.animar_botoes(
+                16,
+                lambda: self.animar_elementos(
                     abrindo,
                     passo + 1,
                     total_passos,
@@ -676,76 +748,49 @@ class ClientView(ctk.CTkToplevel):
             return
 
         self.animacao_em_execucao = False
-        self.anel_luz.lift()
 
         if not abrindo:
-            for botao in self.botoes_animados:
-                botao.lower()
+            for elemento in self.elementos_animados:
+                elemento.lower()
+
+            self.botao_mascote.lift()
 
             self.instrucao.configure(
                 text="Clique no mascote para abrir o menu"
             )
 
     # ========================================================
-    # PULSAÇÃO DO ANEL
-    # ========================================================
-
-    def iniciar_pulsacao(self):
-        if not self.pulsacao_ativa:
-            return
-
-        intensidade = (
-            math.sin(self.pulsacao_passo / 8) + 1
-        ) / 2
-
-        if intensidade > 0.5:
-            cor = RED_MAIN
-        else:
-            cor = RED_DARK
-
-        self.anel_luz.configure(
-            fg_color=cor
-        )
-
-        self.pulsacao_passo += 1
-
-        self.after(
-            90,
-            self.iniciar_pulsacao,
-        )
-
-    # ========================================================
-    # AÇÕES
+    # AÇÕES DOS BOTÕES
     # ========================================================
 
     def abrir_ferramentas(self):
-        self.criar_janela_aviso(
+        self.mostrar_mensagem(
             "Ferramentas",
             (
-                "Aqui serão adicionados Ping, Hash, DNS, "
-                "Scanner de Portas e outras ferramentas."
+                "Nesta área serão disponibilizados Ping, "
+                "Hash, DNS e Scanner de Portas."
             ),
         )
 
     def abrir_servicos(self):
-        self.criar_janela_aviso(
+        self.mostrar_mensagem(
             "Serviços",
             (
-                "Aqui serão adicionados Histórico, "
-                "Relatórios, Jogos e Ajuda."
+                "Nesta área serão disponibilizados histórico, "
+                "relatórios, ajuda e jogos."
             ),
         )
 
     def abrir_configuracoes(self):
-        self.criar_janela_aviso(
+        self.mostrar_mensagem(
             "Configurações",
             (
-                "Aqui serão adicionados temas, cores, "
-                "perfil e preferências."
+                "Nesta área serão disponibilizadas opções "
+                "de tema, cores e preferências."
             ),
         )
 
-    def criar_janela_aviso(
+    def mostrar_mensagem(
         self,
         titulo,
         mensagem,
@@ -753,21 +798,20 @@ class ClientView(ctk.CTkToplevel):
         janela = ctk.CTkToplevel(self)
 
         janela.title(titulo)
-        janela.geometry("470x250")
+        janela.geometry("460x240")
         janela.resizable(False, False)
         janela.configure(fg_color=BG_DARK)
-
         janela.transient(self)
         janela.grab_set()
 
         titulo_label = ctk.CTkLabel(
             janela,
             text=titulo,
-            font=("Arial", 24, "bold"),
-            text_color=ORANGE_MAIN,
+            font=("Arial", 23, "bold"),
+            text_color=RED_MAIN,
         )
         titulo_label.pack(
-            pady=(30, 15)
+            pady=(28, 15)
         )
 
         mensagem_label = ctk.CTkLabel(
@@ -775,7 +819,7 @@ class ClientView(ctk.CTkToplevel):
             text=mensagem,
             font=("Arial", 14),
             text_color=TEXT_LIGHT,
-            wraplength=390,
+            wraplength=380,
             justify="center",
         )
         mensagem_label.pack(
@@ -783,16 +827,16 @@ class ClientView(ctk.CTkToplevel):
             pady=10,
         )
 
-        botao_fechar = ctk.CTkButton(
+        fechar = ctk.CTkButton(
             janela,
             text="Fechar",
             width=140,
             height=36,
             fg_color=RED_MAIN,
-            hover_color=RED_DARK,
+            hover_color="#B42626",
             command=janela.destroy,
         )
-        botao_fechar.pack(
+        fechar.pack(
             pady=15
         )
 
@@ -801,5 +845,4 @@ class ClientView(ctk.CTkToplevel):
     # ========================================================
 
     def fechar_programa(self):
-        self.pulsacao_ativa = False
         self.janela_login.destroy()
