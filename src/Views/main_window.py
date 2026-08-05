@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from PIL import Image, ImageDraw, ImageEnhance, ImageOps
-
+from src.Views.tools_view import ToolsView
 from config import (
     BG_DARK,
     BG_SECONDARY,
@@ -764,13 +764,13 @@ class ClientView(ctk.CTkToplevel):
     # ========================================================
 
     def abrir_ferramentas(self):
-        self.mostrar_mensagem(
-            "Ferramentas",
-            (
-                "Nesta área serão disponibilizados Ping, "
-                "Hash, DNS e Scanner de Portas."
-            ),
-        )
+        ToolsView(self)
+        """
+        Essa area de abrir ferramentas são as mesmas dos serviços
+        são padronizados com a função mostrar_mensagem usando os parametros comuns
+        como Titulo, Mensagem
+        onde todas as telas são iguais.       
+        """
 
     def abrir_servicos(self):
         self.mostrar_mensagem(

@@ -1,0 +1,884 @@
+import customtkinter as ctk
+from tkinter import messagebox
+
+
+# ============================================================
+# CORES
+# ============================================================
+
+BG_PRINCIPAL = "#080B0F"
+BG_LATERAL = "#10141A"
+BG_CARD = "#151A22"
+BG_CARD_HOVER = "#1D2430"
+BG_PAINEL = "#0F1319"
+
+VERMELHO = "#FF3B3B"
+VERMELHO_ESCURO = "#A92525"
+LARANJA = "#FF7A1A"
+VERDE = "#2ED573"
+AMARELO = "#F1C40F"
+
+TEXTO = "#F4F6F8"
+TEXTO_SECUNDARIO = "#9CA4AF"
+BORDA = "#2B323D"
+
+#Constantes para ser manutenievl
+class ToolsView(ctk.CTkToplevel):
+    """
+    Dashboard de ferramentas do CiberToolBox.
+
+    Esta tela apresenta:
+    - categorias;
+    - pesquisa;
+    - cartões;
+    - painel de detalhes;
+    - botão para executar a ferramenta.
+    """
+
+    def __init__(self, janela_principal):
+        super().__init__(janela_principal)
+
+        self.janela_principal = janela_principal
+        self.categoria_atual = "Todas"
+        self.ferramenta_selecionada = None
+        self.cards_criados = []
+
+        self.title("CiberToolBox - Ferramentas")
+        self.geometry("1280x720")
+        self.minsize(1050, 650)
+        self.configure(fg_color=BG_PRINCIPAL)
+
+        try:
+            self.state("zoomed")
+        except ctk.TclError:
+            pass
+
+        self.protocol("WM_DELETE_WINDOW", self.fechar_tela)
+
+        self.ferramentas = self.criar_catalogo()
+
+        self.criar_layout()
+        self.mostrar_ferramentas()
+
+    # ========================================================
+    # CATÁLOGO
+    # ========================================================
+
+    def criar_catalogo(self):
+        """
+        Centraliza as informações exibidas nos cartões.
+
+        Quando você criar uma nova ferramenta, basta adicioná-la
+        nesta lista.
+        """
+        """ Criar nova ferramenta
+                {
+            "nome": "Nova Ferramenta",
+            "icone": "NEW",
+            "categoria": "Rede",
+            "descricao": "Descrição curta da ferramenta.",
+            "explicacao": (
+                "Explicação detalhada para o usuário iniciante."
+            ),
+            "status": "Em desenvolvimento",
+            "cor_status": AMARELO,
+            "acao": None,
+        },"""
+        return [
+            {
+                "nome": "Ping",
+                "icone": "PING",
+                "categoria": "Rede",
+                "descricao": (
+                    "Verifica se um equipamento ou servidor está "
+                    "respondendo na rede."
+                ),
+                "explicacao": (
+                    "O Ping envia pacotes ICMP para um destino e "
+                    "mede o tempo de resposta. A falta de resposta "
+                    "não significa necessariamente que o equipamento "
+                    "esteja desligado, pois o ICMP pode estar bloqueado."
+                ),
+                "status": "Em desenvolvimento",
+                "cor_status": AMARELO,
+                "acao": self.executar_ping,
+            },
+            {
+                "nome": "Consulta DNS",
+                "icone": "DNS",
+                "categoria": "Rede",
+                "descricao": (
+                    "Resolve nomes de domínio e apresenta o endereço IP."
+                ),
+                "explicacao": (
+                    "A consulta DNS transforma nomes como exemplo.com "
+                    "em endereços IP utilizados na comunicação de rede."
+                ),
+                "status": "Em desenvolvimento",
+                "cor_status": AMARELO,
+                "acao": self.executar_dns,
+            },
+            {
+                "nome": "Scanner de Portas",
+                "icone": "PORT",
+                "categoria": "Rede",
+                "descricao": (
+                    "Analisa um intervalo controlado de portas TCP."
+                ),
+                "explicacao": (
+                    "Permite identificar portas acessíveis em um host. "
+                    "Deve ser utilizado somente em equipamentos próprios "
+                    "ou mediante autorização expressa."
+                ),
+                "status": "Em desenvolvimento",
+                "cor_status": AMARELO,
+                "acao": None,
+            },
+            {
+                "nome": "Hash de Texto",
+                "icone": "HASH",
+                "categoria": "Integridade",
+                "descricao": (
+                    "Calcula hashes SHA-256 e SHA-512 de textos."
+                ),
+                "explicacao": (
+                    "Funções hash geram um resumo de tamanho fixo. "
+                    "Elas são utilizadas para verificar integridade e "
+                    "comparar informações sem armazenar o conteúdo original."
+                ),
+                "status": "Em desenvolvimento",
+                "cor_status": AMARELO,
+                "acao": self.executar_hash,
+            },
+            {
+                "nome": "Hash de Arquivo",
+                "icone": "FILE",
+                "categoria": "Integridade",
+                "descricao": (
+                    "Calcula o hash de um arquivo selecionado."
+                ),
+                "explicacao": (
+                    "O hash de arquivo pode ser comparado com o valor "
+                    "fornecido pelo desenvolvedor para verificar se o "
+                    "arquivo foi alterado ou corrompido."
+                ),
+                "status": "Em desenvolvimento",
+                "cor_status": AMARELO,
+                "acao": None,
+            },
+            {
+                "nome": "Analisador de Senha",
+                "icone": "PASS",
+                "categoria": "Credenciais",
+                "descricao": (
+                    "Avalia características básicas de uma senha."
+                ),
+                "explicacao": (
+                    "A análise verifica comprimento, variedade de caracteres "
+                    "e padrões previsíveis. A senha não deve ser salva nem "
+                    "registrada em arquivos de log."
+                ),
+                "status": "Em desenvolvimento",
+                "cor_status": AMARELO,
+                "acao": self.executar_senha,
+            },
+            {
+                "nome": "Informações do Sistema",
+                "icone": "SYS",
+                "categoria": "Sistema",
+                "descricao": (
+                    "Exibe informações básicas do computador."
+                ),
+                "explicacao": (
+                    "Apresenta sistema operacional, arquitetura, nome da "
+                    "máquina e informações úteis para diagnóstico."
+                ),
+                "status": "Em desenvolvimento",
+                "cor_status": AMARELO,
+                "acao": None,
+            },
+            {
+                "nome": "Gerador de Relatório",
+                "icone": "LOG",
+                "categoria": "Sistema",
+                "descricao": (
+                    "Organiza resultados das ferramentas em um relatório."
+                ),
+                "explicacao": (
+                    "O relatório registra somente informações necessárias, "
+                    "evitando senhas, credenciais e outros dados sensíveis."
+                ),
+                "status": "Planejado",
+                "cor_status": TEXTO_SECUNDARIO,
+                "acao": None,
+            },
+        ]
+
+    # ========================================================
+    # LAYOUT
+    # ========================================================
+
+    def criar_layout(self):
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+
+        self.criar_menu_lateral()
+        self.criar_area_principal()
+
+    def criar_menu_lateral(self):
+        self.menu_lateral = ctk.CTkFrame(
+            self,
+            width=230,
+            corner_radius=0,
+            fg_color=BG_LATERAL,
+            border_width=1,
+            border_color=BORDA,
+        )
+        self.menu_lateral.grid(
+            row=0,
+            column=0,
+            sticky="nsew",
+        )
+        self.menu_lateral.grid_propagate(False)
+
+        titulo = ctk.CTkLabel(
+            self.menu_lateral,
+            text="CIBER TOOL",
+            font=("Consolas", 22, "bold"),
+            text_color=LARANJA,
+        )
+        titulo.pack(
+            anchor="w",
+            padx=25,
+            pady=(28, 8),
+        )
+
+        subtitulo = ctk.CTkLabel(
+            self.menu_lateral,
+            text="Categorias",
+            font=("Arial", 12),
+            text_color=TEXTO_SECUNDARIO,
+        )
+        subtitulo.pack(
+            anchor="w",
+            padx=25,
+            pady=(0, 20),
+        )
+
+        categorias = [
+            ("Todas", "Visão geral"),
+            ("Rede", "Conectividade"),
+            ("Integridade", "Hash e arquivos"),
+            ("Credenciais", "Senhas"),
+            ("Sistema", "Diagnóstico"),
+        ]
+
+        self.botoes_categoria = {}
+
+        for categoria, descricao in categorias:
+            botao = ctk.CTkButton(
+                self.menu_lateral,
+                text=f"{categoria}\n{descricao}",
+                width=190,
+                height=58,
+                anchor="w",
+                fg_color="transparent",
+                hover_color=BG_CARD_HOVER,
+                text_color=TEXTO,
+                font=("Arial", 13, "bold"),
+                command=lambda valor=categoria: (
+                    self.selecionar_categoria(valor)
+                ),
+            )
+            botao.pack(
+                padx=18,
+                pady=5,
+            )
+
+            self.botoes_categoria[categoria] = botao
+
+        self.destacar_categoria("Todas")
+
+        espaco = ctk.CTkFrame(
+            self.menu_lateral,
+            fg_color="transparent",
+        )
+        espaco.pack(expand=True)
+
+        aviso = ctk.CTkLabel(
+            self.menu_lateral,
+            text=(
+                "MODO ÉTICO\n"
+                "Use as ferramentas somente\n"
+                "em ambientes autorizados."
+            ),
+            font=("Arial", 11),
+            text_color=TEXTO_SECUNDARIO,
+            justify="left",
+        )
+        aviso.pack(
+            anchor="w",
+            padx=25,
+            pady=18,
+        )
+
+        voltar = ctk.CTkButton(
+            self.menu_lateral,
+            text="Voltar ao início",
+            width=185,
+            height=40,
+            fg_color=VERMELHO,
+            hover_color=VERMELHO_ESCURO,
+            command=self.fechar_tela,
+        )
+        voltar.pack(
+            padx=20,
+            pady=(0, 22),
+        )
+
+    def criar_area_principal(self):
+        self.area_principal = ctk.CTkFrame(
+            self,
+            corner_radius=0,
+            fg_color=BG_PRINCIPAL,
+        )
+        self.area_principal.grid(
+            row=0,
+            column=1,
+            sticky="nsew",
+        )
+
+        self.area_principal.grid_rowconfigure(1, weight=1)
+        self.area_principal.grid_columnconfigure(0, weight=1)
+
+        self.criar_cabecalho()
+        self.criar_conteudo_dashboard()
+
+    def criar_cabecalho(self):
+        cabecalho = ctk.CTkFrame(
+            self.area_principal,
+            height=100,
+            corner_radius=0,
+            fg_color=BG_PRINCIPAL,
+        )
+        cabecalho.grid(
+            row=0,
+            column=0,
+            sticky="ew",
+            padx=30,
+            pady=(20, 0),
+        )
+
+        cabecalho.grid_columnconfigure(0, weight=1)
+
+        textos = ctk.CTkFrame(
+            cabecalho,
+            fg_color="transparent",
+        )
+        textos.grid(
+            row=0,
+            column=0,
+            sticky="w",
+        )
+
+        self.titulo_categoria = ctk.CTkLabel(
+            textos,
+            text="Todas as ferramentas",
+            font=("Arial", 27, "bold"),
+            text_color=TEXTO,
+        )
+        self.titulo_categoria.pack(anchor="w")
+
+        self.resumo_categoria = ctk.CTkLabel(
+            textos,
+            text=(
+                "Selecione uma ferramenta para visualizar "
+                "informações e executá-la."
+            ),
+            font=("Arial", 13),
+            text_color=TEXTO_SECUNDARIO,
+        )
+        self.resumo_categoria.pack(
+            anchor="w",
+            pady=(4, 0),
+        )
+
+        self.campo_pesquisa = ctk.CTkEntry(
+            cabecalho,
+            width=300,
+            height=42,
+            placeholder_text="Pesquisar ferramenta...",
+            fg_color=BG_CARD,
+            border_color=BORDA,
+            text_color=TEXTO,
+        )
+        self.campo_pesquisa.grid(
+            row=0,
+            column=1,
+            padx=(20, 0),
+        )
+
+        self.campo_pesquisa.bind(
+            "<KeyRelease>",
+            lambda evento: self.mostrar_ferramentas(),
+        )
+
+    def criar_conteudo_dashboard(self):
+        self.conteudo_dashboard = ctk.CTkFrame(
+            self.area_principal,
+            fg_color="transparent",
+        )
+        self.conteudo_dashboard.grid(
+            row=1,
+            column=0,
+            sticky="nsew",
+            padx=30,
+            pady=(10, 25),
+        )
+
+        self.conteudo_dashboard.grid_rowconfigure(0, weight=1)
+        self.conteudo_dashboard.grid_columnconfigure(0, weight=3)
+        self.conteudo_dashboard.grid_columnconfigure(1, weight=2)
+
+        self.criar_area_cards()
+        self.criar_painel_detalhes()
+
+    def criar_area_cards(self):
+        self.area_cards = ctk.CTkScrollableFrame(
+            self.conteudo_dashboard,
+            fg_color="transparent",
+            corner_radius=0,
+        )
+        self.area_cards.grid(
+            row=0,
+            column=0,
+            sticky="nsew",
+            padx=(0, 15),
+        )
+
+        self.area_cards.grid_columnconfigure(0, weight=1)
+        self.area_cards.grid_columnconfigure(1, weight=1)
+
+    def criar_painel_detalhes(self):
+        self.painel_detalhes = ctk.CTkFrame(
+            self.conteudo_dashboard,
+            fg_color=BG_PAINEL,
+            corner_radius=16,
+            border_width=1,
+            border_color=BORDA,
+        )
+        self.painel_detalhes.grid(
+            row=0,
+            column=1,
+            sticky="nsew",
+        )
+
+        self.label_icone_detalhe = ctk.CTkLabel(
+            self.painel_detalhes,
+            text="CTB",
+            width=90,
+            height=90,
+            corner_radius=45,
+            fg_color=BG_CARD,
+            text_color=LARANJA,
+            font=("Consolas", 19, "bold"),
+        )
+        self.label_icone_detalhe.pack(
+            pady=(45, 18),
+        )
+
+        self.label_nome_detalhe = ctk.CTkLabel(
+            self.painel_detalhes,
+            text="Selecione uma ferramenta",
+            font=("Arial", 22, "bold"),
+            text_color=TEXTO,
+        )
+        self.label_nome_detalhe.pack(
+            padx=25,
+        )
+
+        self.label_categoria_detalhe = ctk.CTkLabel(
+            self.painel_detalhes,
+            text="",
+            font=("Arial", 12),
+            text_color=LARANJA,
+        )
+        self.label_categoria_detalhe.pack(
+            pady=(5, 20),
+        )
+
+        self.label_explicacao = ctk.CTkLabel(
+            self.painel_detalhes,
+            text=(
+                "Escolha um dos cartões ao lado para saber "
+                "o que a ferramenta faz e como utilizá-la."
+            ),
+            font=("Arial", 14),
+            text_color=TEXTO_SECUNDARIO,
+            justify="left",
+            wraplength=330,
+        )
+        self.label_explicacao.pack(
+            padx=35,
+            pady=10,
+            anchor="w",
+        )
+
+        self.label_status_detalhe = ctk.CTkLabel(
+            self.painel_detalhes,
+            text="Nenhuma ferramenta selecionada",
+            font=("Arial", 12, "bold"),
+            text_color=TEXTO_SECUNDARIO,
+        )
+        self.label_status_detalhe.pack(
+            pady=20,
+        )
+
+        self.botao_executar = ctk.CTkButton(
+            self.painel_detalhes,
+            text="Selecionar ferramenta",
+            width=240,
+            height=46,
+            fg_color=VERMELHO,
+            hover_color=VERMELHO_ESCURO,
+            state="disabled",
+            command=self.executar_ferramenta_selecionada,
+        )
+        self.botao_executar.pack(
+            pady=15,
+        )
+
+    # ========================================================
+    # CARTÕES
+    # ========================================================
+
+    def mostrar_ferramentas(self):
+        for widget in self.area_cards.winfo_children():
+            widget.destroy()
+
+        self.cards_criados.clear()
+
+        pesquisa = self.campo_pesquisa.get().strip().lower()
+
+        ferramentas_filtradas = []
+
+        for ferramenta in self.ferramentas:
+            categoria_valida = (
+                self.categoria_atual == "Todas"
+                or ferramenta["categoria"] == self.categoria_atual
+            )
+
+            pesquisa_valida = (
+                not pesquisa
+                or pesquisa in ferramenta["nome"].lower()
+                or pesquisa in ferramenta["descricao"].lower()
+            )
+
+            if categoria_valida and pesquisa_valida:
+                ferramentas_filtradas.append(ferramenta)
+
+        if not ferramentas_filtradas:
+            vazio = ctk.CTkLabel(
+                self.area_cards,
+                text="Nenhuma ferramenta encontrada.",
+                font=("Arial", 15),
+                text_color=TEXTO_SECUNDARIO,
+            )
+            vazio.grid(
+                row=0,
+                column=0,
+                columnspan=2,
+                pady=80,
+            )
+            return
+
+        for indice, ferramenta in enumerate(ferramentas_filtradas):
+            linha = indice // 2
+            coluna = indice % 2
+
+            card = self.criar_card(ferramenta)
+            card.grid(
+                row=linha,
+                column=coluna,
+                sticky="nsew",
+                padx=8,
+                pady=8,
+            )
+
+    def criar_card(self, ferramenta):
+        card = ctk.CTkFrame(
+            self.area_cards,
+            height=190,
+            fg_color=BG_CARD,
+            corner_radius=14,
+            border_width=1,
+            border_color=BORDA,
+        )
+        card.grid_propagate(False)
+
+        card.grid_columnconfigure(1, weight=1)
+
+        icone = ctk.CTkLabel(
+            card,
+            text=ferramenta["icone"],
+            width=65,
+            height=65,
+            corner_radius=32,
+            fg_color=BG_PAINEL,
+            text_color=LARANJA,
+            font=("Consolas", 14, "bold"),
+        )
+        icone.grid(
+            row=0,
+            column=0,
+            rowspan=2,
+            padx=18,
+            pady=(20, 5),
+        )
+
+        nome = ctk.CTkLabel(
+            card,
+            text=ferramenta["nome"],
+            font=("Arial", 17, "bold"),
+            text_color=TEXTO,
+        )
+        nome.grid(
+            row=0,
+            column=1,
+            sticky="sw",
+            pady=(20, 0),
+        )
+
+        categoria = ctk.CTkLabel(
+            card,
+            text=ferramenta["categoria"],
+            font=("Arial", 11),
+            text_color=LARANJA,
+        )
+        categoria.grid(
+            row=1,
+            column=1,
+            sticky="nw",
+        )
+
+        descricao = ctk.CTkLabel(
+            card,
+            text=ferramenta["descricao"],
+            font=("Arial", 12),
+            text_color=TEXTO_SECUNDARIO,
+            wraplength=270,
+            justify="left",
+        )
+        descricao.grid(
+            row=2,
+            column=0,
+            columnspan=2,
+            sticky="w",
+            padx=18,
+            pady=(10, 8),
+        )
+
+        status = ctk.CTkLabel(
+            card,
+            text=f"● {ferramenta['status']}",
+            font=("Arial", 11, "bold"),
+            text_color=ferramenta["cor_status"],
+        )
+        status.grid(
+            row=3,
+            column=0,
+            columnspan=2,
+            sticky="w",
+            padx=18,
+            pady=(0, 14),
+        )
+
+        widgets_clicaveis = [
+            card,
+            icone,
+            nome,
+            categoria,
+            descricao,
+            status,
+        ]
+
+        for widget in widgets_clicaveis:
+            widget.bind(
+                "<Button-1>",
+                lambda evento, item=ferramenta: (
+                    self.selecionar_ferramenta(item)
+                ),
+            )
+
+            widget.bind(
+                "<Enter>",
+                lambda evento, quadro=card: (
+                    quadro.configure(
+                        fg_color=BG_CARD_HOVER,
+                        border_color=VERMELHO,
+                    )
+                ),
+            )
+
+            widget.bind(
+                "<Leave>",
+                lambda evento, quadro=card: (
+                    quadro.configure(
+                        fg_color=BG_CARD,
+                        border_color=BORDA,
+                    )
+                ),
+            )
+
+        self.cards_criados.append(card)
+
+        return card
+
+    # ========================================================
+    # CATEGORIAS E SELEÇÃO
+    # ========================================================
+
+    def selecionar_categoria(self, categoria):
+        self.categoria_atual = categoria
+        self.destacar_categoria(categoria)
+
+        if categoria == "Todas":
+            self.titulo_categoria.configure(
+                text="Todas as ferramentas"
+            )
+        else:
+            self.titulo_categoria.configure(
+                text=f"Ferramentas de {categoria}"
+            )
+
+        self.ferramenta_selecionada = None
+        self.limpar_detalhes()
+        self.mostrar_ferramentas()
+
+    def destacar_categoria(self, categoria):
+        for nome, botao in self.botoes_categoria.items():
+            if nome == categoria:
+                botao.configure(
+                    fg_color="#2B1719",
+                    text_color=VERMELHO,
+                )
+            else:
+                botao.configure(
+                    fg_color="transparent",
+                    text_color=TEXTO,
+                )
+
+    def selecionar_ferramenta(self, ferramenta):
+        self.ferramenta_selecionada = ferramenta
+
+        self.label_icone_detalhe.configure(
+            text=ferramenta["icone"]
+        )
+
+        self.label_nome_detalhe.configure(
+            text=ferramenta["nome"]
+        )
+
+        self.label_categoria_detalhe.configure(
+            text=ferramenta["categoria"]
+        )
+
+        self.label_explicacao.configure(
+            text=ferramenta["explicacao"]
+        )
+
+        self.label_status_detalhe.configure(
+            text=ferramenta["status"],
+            text_color=ferramenta["cor_status"],
+        )
+
+        if ferramenta["acao"] is None:
+            self.botao_executar.configure(
+                text="Ainda não disponível",
+                state="disabled",
+                fg_color="#343A44",
+            )
+        else:
+            self.botao_executar.configure(
+                text="Abrir ferramenta",
+                state="normal",
+                fg_color=VERMELHO,
+            )
+
+    def limpar_detalhes(self):
+        self.label_icone_detalhe.configure(text="CTB")
+        self.label_nome_detalhe.configure(
+            text="Selecione uma ferramenta"
+        )
+        self.label_categoria_detalhe.configure(text="")
+        self.label_explicacao.configure(
+            text=(
+                "Escolha um dos cartões ao lado para saber "
+                "o que a ferramenta faz e como utilizá-la."
+            )
+        )
+        self.label_status_detalhe.configure(
+            text="Nenhuma ferramenta selecionada",
+            text_color=TEXTO_SECUNDARIO,
+        )
+        self.botao_executar.configure(
+            text="Selecionar ferramenta",
+            state="disabled",
+            fg_color="#343A44",
+        )
+
+    # ========================================================
+    # EXECUÇÃO
+    # ========================================================
+
+    def executar_ferramenta_selecionada(self):
+        if self.ferramenta_selecionada is None:
+            return
+
+        acao = self.ferramenta_selecionada["acao"]
+
+        if acao is not None:
+            acao()
+
+    def executar_ping(self):
+        messagebox.showinfo(
+            "Ping",
+            (
+                "A tela da ferramenta Ping será conectada "
+                "neste botão."
+            ),
+        )
+
+    def executar_dns(self):
+        messagebox.showinfo(
+            "Consulta DNS",
+            (
+                "A tela da ferramenta DNS será conectada "
+                "neste botão."
+            ),
+        )
+
+    def executar_hash(self):
+        messagebox.showinfo(
+            "Hash",
+            (
+                "A tela da ferramenta Hash será conectada "
+                "neste botão."
+            ),
+        )
+
+    def executar_senha(self):
+        messagebox.showinfo(
+            "Analisador de Senha",
+            (
+                "A tela do analisador de senha será conectada "
+                "neste botão."
+            ),
+        )
+
+    # ========================================================
+    # ENCERRAMENTO
+    # ========================================================
+
+    def fechar_tela(self):
+        self.destroy()
