@@ -1,8 +1,9 @@
 {
     "escala_interface": 1.0,
-    "animacoes": false,
-    "abrir_maximizado": false,
+    "animacoes": true,
+    "abrir_maximizado": true,
     "max_portas_scan": 128,
     "timeout_porta": 0.25,
-    "color_setting": none
+    "cor_destaque": "Azul",
+    "tema_fundo": "Escuro"
 }
