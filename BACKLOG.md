@@ -17,7 +17,7 @@
 | # | Funcionalidade | Prioridade | Status |
 |---|---------------|-----------|--------|
 | 1 | (continuar o desenvolvimento das ferramentas do programa) | Alta | ⏳ A fazer |
-| 2 | (finalizar a landing page) | Alta | ⏳ A fazer |
+| 2 | (terminar a landing page) | Alta | ⏳ A fazer |
 | 3 | (escreva aqui) | Alta | ⏳ A fazer |
 | 4 | (escreva aqui) | Média | ⏳ A fazer |
 | 5 | (escreva aqui) | Média | ⏳ A fazer |
