@@ -1,5 +1,7 @@
 import customtkinter as ctk
 from tkinter import messagebox
+from src.Views.tool_execution_view import ToolExecutionView
+from src.Models.settings_model import SettingsModel
 
 
 # ============================================================
@@ -22,7 +24,29 @@ TEXTO = "#F4F6F8"
 TEXTO_SECUNDARIO = "#9CA4AF"
 BORDA = "#2B323D"
 
-#Constantes para ser manutenievl
+def aplicar_tema_salvo():
+    """Aplica o tema salvo às constantes usadas por esta dashboard."""
+    global BG_PRINCIPAL, BG_LATERAL, BG_CARD, BG_CARD_HOVER, BG_PAINEL
+    global VERMELHO, VERMELHO_ESCURO, LARANJA, VERDE, AMARELO
+    global TEXTO, TEXTO_SECUNDARIO, BORDA
+
+    tema = SettingsModel().obter_tema()
+    BG_PRINCIPAL = tema["bg"]
+    BG_LATERAL = tema["secundario"]
+    BG_CARD = tema["card"]
+    BG_CARD_HOVER = tema["card_hover"]
+    BG_PAINEL = tema["painel"]
+    VERMELHO = tema["destaque"]
+    VERMELHO_ESCURO = tema["hover"]
+    LARANJA = tema["destaque"]
+    VERDE = tema["verde"]
+    AMARELO = tema["amarelo"]
+    TEXTO = tema["texto"]
+    TEXTO_SECUNDARIO = tema["texto_secundario"]
+    BORDA = tema["border"]
+
+
+# Constantes continuam simples, mas passam a respeitar Configurações.
 class ToolsView(ctk.CTkToplevel):
     """
     Dashboard de ferramentas do CiberToolBox.
@@ -37,7 +61,7 @@ class ToolsView(ctk.CTkToplevel):
 
     def __init__(self, janela_principal):
         super().__init__(janela_principal)
-
+        aplicar_tema_salvo()
         self.janela_principal = janela_principal
         self.categoria_atual = "Todas"
         self.ferramenta_selecionada = None
@@ -47,6 +71,9 @@ class ToolsView(ctk.CTkToplevel):
         self.geometry("1280x720")
         self.minsize(1050, 650)
         self.configure(fg_color=BG_PRINCIPAL)
+
+        # A dashboard substitui visualmente a tela principal enquanto estiver aberta.
+        self.janela_principal.withdraw()
 
         try:
             self.state("zoomed")
@@ -59,158 +86,107 @@ class ToolsView(ctk.CTkToplevel):
 
         self.criar_layout()
         self.mostrar_ferramentas()
+        self.after(80, self.trazer_para_frente)
+
+    def trazer_para_frente(self):
+        self.lift()
+        self.focus_force()
+        try:
+            self.attributes("-topmost", True)
+            self.after(180, lambda: self.attributes("-topmost", False))
+        except ctk.TclError:
+            pass
 
     # ========================================================
     # CATÁLOGO
     # ========================================================
 
     def criar_catalogo(self):
-        """
-        Centraliza as informações exibidas nos cartões.
-
-        Quando você criar uma nova ferramenta, basta adicioná-la
-        nesta lista.
-        """
-        """ Criar nova ferramenta
-                {
-            "nome": "Nova Ferramenta",
-            "icone": "NEW",
-            "categoria": "Rede",
-            "descricao": "Descrição curta da ferramenta.",
-            "explicacao": (
-                "Explicação detalhada para o usuário iniciante."
-            ),
-            "status": "Em desenvolvimento",
-            "cor_status": AMARELO,
-            "acao": None,
-        },"""
+        """Catálogo central das ferramentas exibidas na dashboard."""
         return [
             {
-                "nome": "Ping",
-                "icone": "PING",
-                "categoria": "Rede",
-                "descricao": (
-                    "Verifica se um equipamento ou servidor está "
-                    "respondendo na rede."
-                ),
-                "explicacao": (
-                    "O Ping envia pacotes ICMP para um destino e "
-                    "mede o tempo de resposta. A falta de resposta "
-                    "não significa necessariamente que o equipamento "
-                    "esteja desligado, pois o ICMP pode estar bloqueado."
-                ),
-                "status": "Em desenvolvimento",
-                "cor_status": AMARELO,
-                "acao": self.executar_ping,
+                "nome": "Ping", "icone": "PING", "categoria": "Rede",
+                "descricao": "Verifica conectividade e aceita parâmetros básicos do comando Ping.",
+                "explicacao": "Permite testar alcance e latência. Parâmetros extras são validados para evitar execução arbitrária.",
+                "status": "Disponível", "cor_status": VERDE, "acao": self.executar_ping,
             },
             {
-                "nome": "Consulta DNS",
-                "icone": "DNS",
-                "categoria": "Rede",
-                "descricao": (
-                    "Resolve nomes de domínio e apresenta o endereço IP."
-                ),
-                "explicacao": (
-                    "A consulta DNS transforma nomes como exemplo.com "
-                    "em endereços IP utilizados na comunicação de rede."
-                ),
-                "status": "Em desenvolvimento",
-                "cor_status": AMARELO,
-                "acao": self.executar_dns,
+                "nome": "Consulta DNS", "icone": "DNS", "categoria": "Rede",
+                "descricao": "Resolve nomes de domínio e apresenta endereços IP.",
+                "explicacao": "Útil para diagnóstico de resolução de nomes e conectividade.",
+                "status": "Disponível", "cor_status": VERDE, "acao": self.executar_dns,
             },
             {
-                "nome": "Scanner de Portas",
-                "icone": "PORT",
-                "categoria": "Rede",
-                "descricao": (
-                    "Analisa um intervalo controlado de portas TCP."
-                ),
-                "explicacao": (
-                    "Permite identificar portas acessíveis em um host. "
-                    "Deve ser utilizado somente em equipamentos próprios "
-                    "ou mediante autorização expressa."
-                ),
-                "status": "Em desenvolvimento",
-                "cor_status": AMARELO,
-                "acao": None,
+                "nome": "Scanner de Portas", "icone": "PORT", "categoria": "Rede",
+                "descricao": "Analisa um intervalo controlado de portas TCP.",
+                "explicacao": "Destinado a equipamentos próprios ou ambientes autorizados. O limite é configurável.",
+                "status": "Disponível", "cor_status": VERDE, "acao": self.executar_scanner,
             },
             {
-                "nome": "Hash de Texto",
-                "icone": "HASH",
-                "categoria": "Integridade",
-                "descricao": (
-                    "Calcula hashes SHA-256 e SHA-512 de textos."
-                ),
-                "explicacao": (
-                    "Funções hash geram um resumo de tamanho fixo. "
-                    "Elas são utilizadas para verificar integridade e "
-                    "comparar informações sem armazenar o conteúdo original."
-                ),
-                "status": "Em desenvolvimento",
-                "cor_status": AMARELO,
-                "acao": self.executar_hash,
+                "nome": "Nmap", "icone": "NMAP", "categoria": "Auditoria",
+                "descricao": "Executa perfis básicos do Nmap com parâmetros controlados.",
+                "explicacao": "Permite inventário de portas e identificação leve de serviços. Scripts NSE e opções evasivas ficam bloqueados no protótipo.",
+                "status": "Disponível*", "cor_status": VERDE, "acao": self.executar_nmap,
             },
             {
-                "nome": "Hash de Arquivo",
-                "icone": "FILE",
-                "categoria": "Integridade",
-                "descricao": (
-                    "Calcula o hash de um arquivo selecionado."
-                ),
-                "explicacao": (
-                    "O hash de arquivo pode ser comparado com o valor "
-                    "fornecido pelo desenvolvedor para verificar se o "
-                    "arquivo foi alterado ou corrompido."
-                ),
-                "status": "Em desenvolvimento",
-                "cor_status": AMARELO,
-                "acao": None,
+                "nome": "Scapy - Diagnóstico ICMP", "icone": "SCAPY", "categoria": "Rede",
+                "descricao": "Envia um pacote ICMP simples e apresenta o resumo da resposta.",
+                "explicacao": "Demonstra criação e análise de pacotes com Scapy para fins de diagnóstico.",
+                "status": "Disponível", "cor_status": VERDE, "acao": self.executar_scapy,
             },
             {
-                "nome": "Analisador de Senha",
-                "icone": "PASS",
-                "categoria": "Credenciais",
-                "descricao": (
-                    "Avalia características básicas de uma senha."
-                ),
-                "explicacao": (
-                    "A análise verifica comprimento, variedade de caracteres "
-                    "e padrões previsíveis. A senha não deve ser salva nem "
-                    "registrada em arquivos de log."
-                ),
-                "status": "Em desenvolvimento",
-                "cor_status": AMARELO,
-                "acao": self.executar_senha,
+                "nome": "Análise de Vulnerabilidade Web", "icone": "WEB", "categoria": "Auditoria",
+                "descricao": "Verifica cabeçalhos HTTP de segurança e informações básicas de TLS.",
+                "explicacao": "É uma checagem passiva de configuração. Não explora vulnerabilidades nem tenta obter acesso ao alvo.",
+                "status": "Disponível", "cor_status": VERDE, "acao": self.executar_vulnerabilidade,
             },
             {
-                "nome": "Informações do Sistema",
-                "icone": "SYS",
-                "categoria": "Sistema",
-                "descricao": (
-                    "Exibe informações básicas do computador."
-                ),
-                "explicacao": (
-                    "Apresenta sistema operacional, arquitetura, nome da "
-                    "máquina e informações úteis para diagnóstico."
-                ),
-                "status": "Em desenvolvimento",
-                "cor_status": AMARELO,
-                "acao": None,
+                "nome": "Hash de Texto", "icone": "HASH", "categoria": "Integridade",
+                "descricao": "Calcula hashes SHA-256 e SHA-512 de textos.",
+                "explicacao": "Funções hash ajudam a demonstrar integridade e comparação de conteúdo.",
+                "status": "Disponível", "cor_status": VERDE, "acao": self.executar_hash,
             },
             {
-                "nome": "Gerador de Relatório",
-                "icone": "LOG",
-                "categoria": "Sistema",
-                "descricao": (
-                    "Organiza resultados das ferramentas em um relatório."
-                ),
-                "explicacao": (
-                    "O relatório registra somente informações necessárias, "
-                    "evitando senhas, credenciais e outros dados sensíveis."
-                ),
-                "status": "Planejado",
-                "cor_status": TEXTO_SECUNDARIO,
-                "acao": None,
+                "nome": "Hash de Arquivo", "icone": "FILE", "categoria": "Integridade",
+                "descricao": "Calcula o hash de um arquivo selecionado.",
+                "explicacao": "Permite verificar se um arquivo foi alterado quando existe um hash de referência.",
+                "status": "Disponível", "cor_status": VERDE, "acao": self.executar_hash_arquivo,
+            },
+            {
+                "nome": "Comparar Hashes", "icone": "CMP", "categoria": "Integridade",
+                "descricao": "Compara dois hashes para verificar se são idênticos.",
+                "explicacao": "Útil para validação de integridade de arquivos e conteúdo.",
+                "status": "Disponível", "cor_status": VERDE, "acao": self.executar_comparar_hashes,
+            },
+            {
+                "nome": "Criptografar Arquivo", "icone": "LOCK", "categoria": "Criptografia",
+                "descricao": "Criptografa um arquivo com senha e cria uma cópia .ctb.",
+                "explicacao": "Usa derivação de chave por senha e criptografia autenticada. O arquivo original é mantido.",
+                "status": "Disponível", "cor_status": VERDE, "acao": self.executar_criptografar,
+            },
+            {
+                "nome": "Descriptografar Arquivo", "icone": "OPEN", "categoria": "Criptografia",
+                "descricao": "Recupera um arquivo .ctb utilizando a senha correta.",
+                "explicacao": "A descriptografia valida a integridade e falha caso a senha esteja incorreta ou o arquivo tenha sido alterado.",
+                "status": "Disponível", "cor_status": VERDE, "acao": self.executar_descriptografar,
+            },
+            {
+                "nome": "Analisador de Senha", "icone": "PASS", "categoria": "Credenciais",
+                "descricao": "Avalia características básicas de uma senha.",
+                "explicacao": "A senha é analisada apenas em memória e não é registrada no histórico.",
+                "status": "Disponível", "cor_status": VERDE, "acao": self.executar_senha,
+            },
+            {
+                "nome": "Informações do Sistema", "icone": "SYS", "categoria": "Sistema",
+                "descricao": "Exibe informações básicas do computador.",
+                "explicacao": "Apresenta dados úteis para inventário e diagnóstico do ambiente local.",
+                "status": "Disponível", "cor_status": VERDE, "acao": self.executar_sistema,
+            },
+            {
+                "nome": "Gerador de Relatório", "icone": "LOG", "categoria": "Sistema",
+                "descricao": "Organiza observações em um relatório simples.",
+                "explicacao": "Pode ser usado para registrar resultados sem incluir credenciais ou senhas.",
+                "status": "Disponível", "cor_status": VERDE, "acao": self.executar_relatorio,
             },
         ]
 
@@ -268,7 +244,9 @@ class ToolsView(ctk.CTkToplevel):
         categorias = [
             ("Todas", "Visão geral"),
             ("Rede", "Conectividade"),
+            ("Auditoria", "Nmap e análise"),
             ("Integridade", "Hash e arquivos"),
+            ("Criptografia", "Proteção de arquivos"),
             ("Credenciais", "Senhas"),
             ("Sistema", "Diagnóstico"),
         ]
@@ -840,41 +818,50 @@ class ToolsView(ctk.CTkToplevel):
         if acao is not None:
             acao()
 
+    def abrir_ferramenta(self, nome):
+        ToolExecutionView(self, nome)
+
     def executar_ping(self):
-        messagebox.showinfo(
-            "Ping",
-            (
-                "A tela da ferramenta Ping será conectada "
-                "neste botão."
-            ),
-        )
+        self.abrir_ferramenta("Ping")
 
     def executar_dns(self):
-        messagebox.showinfo(
-            "Consulta DNS",
-            (
-                "A tela da ferramenta DNS será conectada "
-                "neste botão."
-            ),
-        )
+        self.abrir_ferramenta("Consulta DNS")
+
+    def executar_scanner(self):
+        self.abrir_ferramenta("Scanner de Portas")
 
     def executar_hash(self):
-        messagebox.showinfo(
-            "Hash",
-            (
-                "A tela da ferramenta Hash será conectada "
-                "neste botão."
-            ),
-        )
+        self.abrir_ferramenta("Hash de Texto")
+
+    def executar_hash_arquivo(self):
+        self.abrir_ferramenta("Hash de Arquivo")
+
+    def executar_comparar_hashes(self):
+        self.abrir_ferramenta("Comparar Hashes")
 
     def executar_senha(self):
-        messagebox.showinfo(
-            "Analisador de Senha",
-            (
-                "A tela do analisador de senha será conectada "
-                "neste botão."
-            ),
-        )
+        self.abrir_ferramenta("Analisador de Senha")
+
+    def executar_sistema(self):
+        self.abrir_ferramenta("Informações do Sistema")
+
+    def executar_relatorio(self):
+        self.abrir_ferramenta("Gerador de Relatório")
+
+    def executar_nmap(self):
+        self.abrir_ferramenta("Nmap")
+
+    def executar_scapy(self):
+        self.abrir_ferramenta("Scapy - Diagnóstico ICMP")
+
+    def executar_vulnerabilidade(self):
+        self.abrir_ferramenta("Análise de Vulnerabilidade Web")
+
+    def executar_criptografar(self):
+        self.abrir_ferramenta("Criptografar Arquivo")
+
+    def executar_descriptografar(self):
+        self.abrir_ferramenta("Descriptografar Arquivo")
 
     # ========================================================
     # ENCERRAMENTO
@@ -882,3 +869,11 @@ class ToolsView(ctk.CTkToplevel):
 
     def fechar_tela(self):
         self.destroy()
+        if self.janela_principal.winfo_exists():
+            self.janela_principal.deiconify()
+            try:
+                self.janela_principal.state("zoomed")
+            except ctk.TclError:
+                pass
+            self.janela_principal.lift()
+            self.janela_principal.focus_force()

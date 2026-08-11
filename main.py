@@ -13,8 +13,13 @@ def verificar_e_instalar_requisitos():
     pacotes_ausentes = []
     for requisito in requisitos:
         nome_pacote = requisito.split("==")[0].split(">=")[0].strip()
+        mapa_importacao = {
+            "pillow": "PIL",
+            "customtkinter": "customtkinter",
+        }
+        nome_import = mapa_importacao.get(nome_pacote.lower(), nome_pacote.lower().replace("-", "_"))
         try:
-            __import__(nome_pacote.lower().replace("-", "_")) 
+            __import__(nome_import)
         except ImportError:
             pacotes_ausentes.append(requisito)
 
