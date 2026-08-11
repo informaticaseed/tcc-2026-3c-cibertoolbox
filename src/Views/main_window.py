@@ -1,6 +1,8 @@
 import customtkinter as ctk
 from PIL import Image, ImageDraw, ImageEnhance, ImageOps
 from src.Views.tools_view import ToolsView
+from src.Views.config_view import ConfigView
+from src.Models.settings_model import SettingsModel
 from config import (
     BG_DARK,
     BG_SECONDARY,
@@ -29,6 +31,7 @@ class ClientView(ctk.CTkToplevel):
         super().__init__(janela_login)
 
         self.janela_login = janela_login
+        self.settings_model = SettingsModel()
 
         self.menu_aberto = False
         self.animacao_em_execucao = False
@@ -38,10 +41,13 @@ class ClientView(ctk.CTkToplevel):
         self.minsize(1050, 650)
         self.configure(fg_color=BG_DARK)
 
-        try:
-            self.state("zoomed")
-        except ctk.TclError:
-            pass
+        settings = self.settings_model.carregar()
+        ctk.set_widget_scaling(float(settings.get("escala_interface", 1.0)))
+        if settings.get("abrir_maximizado", True):
+            try:
+                self.state("zoomed")
+            except ctk.TclError:
+                pass
 
         self.protocol(
             "WM_DELETE_WINDOW",
@@ -459,7 +465,7 @@ class ClientView(ctk.CTkToplevel):
 
         versao = ctk.CTkLabel(
             barra,
-            text="v0.2.0",
+            text="v0.3.0",
             font=("Consolas", 12),
             text_color=TEXT_SECONDARY,
         )
@@ -676,20 +682,22 @@ class ClientView(ctk.CTkToplevel):
 
         self.botao_mascote.lift()
 
+        total = 22 if self.settings_model.carregar().get("animacoes", True) else 1
         self.animar_elementos(
             abrindo=True,
             passo=0,
-            total_passos=22,
+            total_passos=total,
         )
 
     def fechar_menu(self):
         self.menu_aberto = False
         self.animacao_em_execucao = True
 
+        total = 22 if self.settings_model.carregar().get("animacoes", True) else 1
         self.animar_elementos(
             abrindo=False,
             passo=0,
-            total_passos=22,
+            total_passos=total,
         )
 
     def animar_elementos(
@@ -782,13 +790,7 @@ class ClientView(ctk.CTkToplevel):
         )
 
     def abrir_configuracoes(self):
-        self.mostrar_mensagem(
-            "Configurações",
-            (
-                "Nesta área serão disponibilizadas opções "
-                "de tema, cores e preferências."
-            ),
-        )
+        ConfigView(self)
 
     def mostrar_mensagem(
         self,

@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import messagebox
+from src.Views.tool_execution_view import ToolExecutionView
 
 
 # ============================================================
@@ -37,7 +38,6 @@ class ToolsView(ctk.CTkToplevel):
 
     def __init__(self, janela_principal):
         super().__init__(janela_principal)
-
         self.janela_principal = janela_principal
         self.categoria_atual = "Todas"
         self.ferramenta_selecionada = None
@@ -47,6 +47,9 @@ class ToolsView(ctk.CTkToplevel):
         self.geometry("1280x720")
         self.minsize(1050, 650)
         self.configure(fg_color=BG_PRINCIPAL)
+
+        # A dashboard substitui visualmente a tela principal enquanto estiver aberta.
+        self.janela_principal.withdraw()
 
         try:
             self.state("zoomed")
@@ -59,6 +62,16 @@ class ToolsView(ctk.CTkToplevel):
 
         self.criar_layout()
         self.mostrar_ferramentas()
+        self.after(80, self.trazer_para_frente)
+
+    def trazer_para_frente(self):
+        self.lift()
+        self.focus_force()
+        try:
+            self.attributes("-topmost", True)
+            self.after(180, lambda: self.attributes("-topmost", False))
+        except ctk.TclError:
+            pass
 
     # ========================================================
     # CATÁLOGO
@@ -99,8 +112,8 @@ class ToolsView(ctk.CTkToplevel):
                     "não significa necessariamente que o equipamento "
                     "esteja desligado, pois o ICMP pode estar bloqueado."
                 ),
-                "status": "Em desenvolvimento",
-                "cor_status": AMARELO,
+                "status": "Disponível",
+                "cor_status": VERDE,
                 "acao": self.executar_ping,
             },
             {
@@ -114,8 +127,8 @@ class ToolsView(ctk.CTkToplevel):
                     "A consulta DNS transforma nomes como exemplo.com "
                     "em endereços IP utilizados na comunicação de rede."
                 ),
-                "status": "Em desenvolvimento",
-                "cor_status": AMARELO,
+                "status": "Disponível",
+                "cor_status": VERDE,
                 "acao": self.executar_dns,
             },
             {
@@ -130,9 +143,9 @@ class ToolsView(ctk.CTkToplevel):
                     "Deve ser utilizado somente em equipamentos próprios "
                     "ou mediante autorização expressa."
                 ),
-                "status": "Em desenvolvimento",
-                "cor_status": AMARELO,
-                "acao": None,
+                "status": "Disponível",
+                "cor_status": VERDE,
+                "acao": self.executar_scanner,
             },
             {
                 "nome": "Hash de Texto",
@@ -146,8 +159,8 @@ class ToolsView(ctk.CTkToplevel):
                     "Elas são utilizadas para verificar integridade e "
                     "comparar informações sem armazenar o conteúdo original."
                 ),
-                "status": "Em desenvolvimento",
-                "cor_status": AMARELO,
+                "status": "Disponível",
+                "cor_status": VERDE,
                 "acao": self.executar_hash,
             },
             {
@@ -162,9 +175,19 @@ class ToolsView(ctk.CTkToplevel):
                     "fornecido pelo desenvolvedor para verificar se o "
                     "arquivo foi alterado ou corrompido."
                 ),
-                "status": "Em desenvolvimento",
-                "cor_status": AMARELO,
-                "acao": None,
+                "status": "Disponível",
+                "cor_status": VERDE,
+                "acao": self.executar_hash_arquivo,
+            },
+            {
+                "nome": "Comparar Hashes",
+                "icone": "CMP",
+                "categoria": "Integridade",
+                "descricao": "Compara dois hashes para verificar se são idênticos.",
+                "explicacao": "Útil para validar integridade quando você já possui um hash de referência.",
+                "status": "Disponível",
+                "cor_status": VERDE,
+                "acao": self.executar_comparar_hashes,
             },
             {
                 "nome": "Analisador de Senha",
@@ -178,8 +201,8 @@ class ToolsView(ctk.CTkToplevel):
                     "e padrões previsíveis. A senha não deve ser salva nem "
                     "registrada em arquivos de log."
                 ),
-                "status": "Em desenvolvimento",
-                "cor_status": AMARELO,
+                "status": "Disponível",
+                "cor_status": VERDE,
                 "acao": self.executar_senha,
             },
             {
@@ -193,9 +216,9 @@ class ToolsView(ctk.CTkToplevel):
                     "Apresenta sistema operacional, arquitetura, nome da "
                     "máquina e informações úteis para diagnóstico."
                 ),
-                "status": "Em desenvolvimento",
-                "cor_status": AMARELO,
-                "acao": None,
+                "status": "Disponível",
+                "cor_status": VERDE,
+                "acao": self.executar_sistema,
             },
             {
                 "nome": "Gerador de Relatório",
@@ -208,9 +231,9 @@ class ToolsView(ctk.CTkToplevel):
                     "O relatório registra somente informações necessárias, "
                     "evitando senhas, credenciais e outros dados sensíveis."
                 ),
-                "status": "Planejado",
-                "cor_status": TEXTO_SECUNDARIO,
-                "acao": None,
+                "status": "Disponível",
+                "cor_status": VERDE,
+                "acao": self.executar_relatorio,
             },
         ]
 
@@ -840,41 +863,35 @@ class ToolsView(ctk.CTkToplevel):
         if acao is not None:
             acao()
 
+    def abrir_ferramenta(self, nome):
+        ToolExecutionView(self, nome)
+
     def executar_ping(self):
-        messagebox.showinfo(
-            "Ping",
-            (
-                "A tela da ferramenta Ping será conectada "
-                "neste botão."
-            ),
-        )
+        self.abrir_ferramenta("Ping")
 
     def executar_dns(self):
-        messagebox.showinfo(
-            "Consulta DNS",
-            (
-                "A tela da ferramenta DNS será conectada "
-                "neste botão."
-            ),
-        )
+        self.abrir_ferramenta("Consulta DNS")
+
+    def executar_scanner(self):
+        self.abrir_ferramenta("Scanner de Portas")
 
     def executar_hash(self):
-        messagebox.showinfo(
-            "Hash",
-            (
-                "A tela da ferramenta Hash será conectada "
-                "neste botão."
-            ),
-        )
+        self.abrir_ferramenta("Hash de Texto")
+
+    def executar_hash_arquivo(self):
+        self.abrir_ferramenta("Hash de Arquivo")
+
+    def executar_comparar_hashes(self):
+        self.abrir_ferramenta("Comparar Hashes")
 
     def executar_senha(self):
-        messagebox.showinfo(
-            "Analisador de Senha",
-            (
-                "A tela do analisador de senha será conectada "
-                "neste botão."
-            ),
-        )
+        self.abrir_ferramenta("Analisador de Senha")
+
+    def executar_sistema(self):
+        self.abrir_ferramenta("Informações do Sistema")
+
+    def executar_relatorio(self):
+        self.abrir_ferramenta("Gerador de Relatório")
 
     # ========================================================
     # ENCERRAMENTO
@@ -882,3 +899,11 @@ class ToolsView(ctk.CTkToplevel):
 
     def fechar_tela(self):
         self.destroy()
+        if self.janela_principal.winfo_exists():
+            self.janela_principal.deiconify()
+            try:
+                self.janela_principal.state("zoomed")
+            except ctk.TclError:
+                pass
+            self.janela_principal.lift()
+            self.janela_principal.focus_force()
