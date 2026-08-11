@@ -30,13 +30,14 @@
 
 ## Quinzena 2 — 10/08 a 22/08
 
-### Compromissos assumidos em 10/08
+### Compromissos assumidos em 11/08
 
 | Integrante | O que se comprometeu a fazer |
 |-----------|------------------------------|
-| (nome 1) | |
-| (nome 2) | |
-| (nome 3) | |
+| Arthur | Sistema de serviço e banco de dados|
+| Davi | Adicionar imagem na landing page, adicioar cores na landing page e informações sobre o sistema|
+| Vinícius | Documentação parcialmente pronta no modelo de TCC da escola|
+| Natan | Diagrama de caso de uso e banco de dados|
 
 ### Verificação em 22/08
 

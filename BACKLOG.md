@@ -16,8 +16,8 @@
 
 | # | Funcionalidade | Prioridade | Status |
 |---|---------------|-----------|--------|
-| 1 | (escreva aqui) | Alta | ⏳ A fazer |
-| 2 | (escreva aqui) | Alta | ⏳ A fazer |
+| 1 | (continuar o desenvolvimento das ferramentas do programa) | Alta | ⏳ A fazer |
+| 2 | (terminar a landing page) | Alta | ⏳ A fazer |
 | 3 | (escreva aqui) | Alta | ⏳ A fazer |
 | 4 | (escreva aqui) | Média | ⏳ A fazer |
 | 5 | (escreva aqui) | Média | ⏳ A fazer |
@@ -29,7 +29,7 @@
 
 ## 🚫 Fora do escopo (não entra no MVP)
 
-- (o que vocês decidiram não fazer)
+- (o que vocês decidiram não fazer): não estender muito o desenvolvimento e focar no necessário 
 - (o que ficou para depois)
 
 ---
