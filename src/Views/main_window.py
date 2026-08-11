@@ -32,10 +32,7 @@ class ClientView(ctk.CTkToplevel):
 
         self.janela_login = janela_login
         self.settings_model = SettingsModel()
-<<<<<<< HEAD
         self.carregar_tema()
-=======
->>>>>>> 9c2c9652a37a693c9903b92e712abd3019443202
 
         self.menu_aberto = False
         self.animacao_em_execucao = False
