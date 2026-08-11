@@ -1,7 +1,10 @@
 import customtkinter as ctk
 from tkinter import messagebox
 from src.Views.tool_execution_view import ToolExecutionView
+<<<<<<< HEAD
 from src.Models.settings_model import SettingsModel
+=======
+>>>>>>> 9c2c9652a37a693c9903b92e712abd3019443202
 
 
 # ============================================================
@@ -61,7 +64,10 @@ class ToolsView(ctk.CTkToplevel):
 
     def __init__(self, janela_principal):
         super().__init__(janela_principal)
+<<<<<<< HEAD
         aplicar_tema_salvo()
+=======
+>>>>>>> 9c2c9652a37a693c9903b92e712abd3019443202
         self.janela_principal = janela_principal
         self.categoria_atual = "Todas"
         self.ferramenta_selecionada = None
@@ -105,6 +111,7 @@ class ToolsView(ctk.CTkToplevel):
         """Catálogo central das ferramentas exibidas na dashboard."""
         return [
             {
+<<<<<<< HEAD
                 "nome": "Ping", "icone": "PING", "categoria": "Rede",
                 "descricao": "Verifica conectividade e aceita parâmetros básicos do comando Ping.",
                 "explicacao": "Permite testar alcance e latência. Parâmetros extras são validados para evitar execução arbitrária.",
@@ -187,6 +194,143 @@ class ToolsView(ctk.CTkToplevel):
                 "descricao": "Organiza observações em um relatório simples.",
                 "explicacao": "Pode ser usado para registrar resultados sem incluir credenciais ou senhas.",
                 "status": "Disponível", "cor_status": VERDE, "acao": self.executar_relatorio,
+=======
+                "nome": "Ping",
+                "icone": "PING",
+                "categoria": "Rede",
+                "descricao": (
+                    "Verifica se um equipamento ou servidor está "
+                    "respondendo na rede."
+                ),
+                "explicacao": (
+                    "O Ping envia pacotes ICMP para um destino e "
+                    "mede o tempo de resposta. A falta de resposta "
+                    "não significa necessariamente que o equipamento "
+                    "esteja desligado, pois o ICMP pode estar bloqueado."
+                ),
+                "status": "Disponível",
+                "cor_status": VERDE,
+                "acao": self.executar_ping,
+            },
+            {
+                "nome": "Consulta DNS",
+                "icone": "DNS",
+                "categoria": "Rede",
+                "descricao": (
+                    "Resolve nomes de domínio e apresenta o endereço IP."
+                ),
+                "explicacao": (
+                    "A consulta DNS transforma nomes como exemplo.com "
+                    "em endereços IP utilizados na comunicação de rede."
+                ),
+                "status": "Disponível",
+                "cor_status": VERDE,
+                "acao": self.executar_dns,
+            },
+            {
+                "nome": "Scanner de Portas",
+                "icone": "PORT",
+                "categoria": "Rede",
+                "descricao": (
+                    "Analisa um intervalo controlado de portas TCP."
+                ),
+                "explicacao": (
+                    "Permite identificar portas acessíveis em um host. "
+                    "Deve ser utilizado somente em equipamentos próprios "
+                    "ou mediante autorização expressa."
+                ),
+                "status": "Disponível",
+                "cor_status": VERDE,
+                "acao": self.executar_scanner,
+            },
+            {
+                "nome": "Hash de Texto",
+                "icone": "HASH",
+                "categoria": "Integridade",
+                "descricao": (
+                    "Calcula hashes SHA-256 e SHA-512 de textos."
+                ),
+                "explicacao": (
+                    "Funções hash geram um resumo de tamanho fixo. "
+                    "Elas são utilizadas para verificar integridade e "
+                    "comparar informações sem armazenar o conteúdo original."
+                ),
+                "status": "Disponível",
+                "cor_status": VERDE,
+                "acao": self.executar_hash,
+            },
+            {
+                "nome": "Hash de Arquivo",
+                "icone": "FILE",
+                "categoria": "Integridade",
+                "descricao": (
+                    "Calcula o hash de um arquivo selecionado."
+                ),
+                "explicacao": (
+                    "O hash de arquivo pode ser comparado com o valor "
+                    "fornecido pelo desenvolvedor para verificar se o "
+                    "arquivo foi alterado ou corrompido."
+                ),
+                "status": "Disponível",
+                "cor_status": VERDE,
+                "acao": self.executar_hash_arquivo,
+            },
+            {
+                "nome": "Comparar Hashes",
+                "icone": "CMP",
+                "categoria": "Integridade",
+                "descricao": "Compara dois hashes para verificar se são idênticos.",
+                "explicacao": "Útil para validar integridade quando você já possui um hash de referência.",
+                "status": "Disponível",
+                "cor_status": VERDE,
+                "acao": self.executar_comparar_hashes,
+            },
+            {
+                "nome": "Analisador de Senha",
+                "icone": "PASS",
+                "categoria": "Credenciais",
+                "descricao": (
+                    "Avalia características básicas de uma senha."
+                ),
+                "explicacao": (
+                    "A análise verifica comprimento, variedade de caracteres "
+                    "e padrões previsíveis. A senha não deve ser salva nem "
+                    "registrada em arquivos de log."
+                ),
+                "status": "Disponível",
+                "cor_status": VERDE,
+                "acao": self.executar_senha,
+            },
+            {
+                "nome": "Informações do Sistema",
+                "icone": "SYS",
+                "categoria": "Sistema",
+                "descricao": (
+                    "Exibe informações básicas do computador."
+                ),
+                "explicacao": (
+                    "Apresenta sistema operacional, arquitetura, nome da "
+                    "máquina e informações úteis para diagnóstico."
+                ),
+                "status": "Disponível",
+                "cor_status": VERDE,
+                "acao": self.executar_sistema,
+            },
+            {
+                "nome": "Gerador de Relatório",
+                "icone": "LOG",
+                "categoria": "Sistema",
+                "descricao": (
+                    "Organiza resultados das ferramentas em um relatório."
+                ),
+                "explicacao": (
+                    "O relatório registra somente informações necessárias, "
+                    "evitando senhas, credenciais e outros dados sensíveis."
+                ),
+                "status": "Disponível",
+                "cor_status": VERDE,
+                "acao": self.executar_relatorio,
+>>>>>>> 9c2c9652a37a693c9903b92e712abd3019443202
             },
         ]
 
@@ -847,6 +991,7 @@ class ToolsView(ctk.CTkToplevel):
 
     def executar_relatorio(self):
         self.abrir_ferramenta("Gerador de Relatório")
+<<<<<<< HEAD
 
     def executar_nmap(self):
         self.abrir_ferramenta("Nmap")
@@ -862,6 +1007,8 @@ class ToolsView(ctk.CTkToplevel):
 
     def executar_descriptografar(self):
         self.abrir_ferramenta("Descriptografar Arquivo")
+=======
+>>>>>>> 9c2c9652a37a693c9903b92e712abd3019443202
 
     # ========================================================
     # ENCERRAMENTO
