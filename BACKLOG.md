@@ -29,7 +29,7 @@
 
 ## 🚫 Fora do escopo (não entra no MVP)
 
-- (o que vocês decidiram não fazer): não adicionar muitas coisas no programa e focar na funcionalidade
+- (o que vocês decidiram não fazer): não estender muito o desenvolvimento e focar no necessário 
 - (o que ficou para depois)
 
 ---
