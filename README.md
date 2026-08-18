@@ -8,7 +8,7 @@
 | Nome completo | GitHub | Turma |
 |--------------|--------|-------|
 | (Davi brasileiro) | @username | 3C |
-| (Vinícius Fernandes) | @username | 3C |  
+| (Vinícius Fernandes) @viniciusfsb2009|3C |  
 | (Arthur Feitosa Rodrigues dos Santos) | @arthurfeitosarod | 3C |eu sou dono
 | (Natan nagashima) | @username | 3C|
 
