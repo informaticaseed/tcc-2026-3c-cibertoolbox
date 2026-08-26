@@ -3,6 +3,7 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageOps
 from src.Views.tools_view import ToolsView
 from src.Views.config_view import ConfigView
 from src.Models.settings_model import SettingsModel
+from src.Views.serviceView import ServicesView
 from config import (
     BG_DARK,
     BG_SECONDARY,
@@ -814,13 +815,7 @@ class ClientView(ctk.CTkToplevel):
         """
 
     def abrir_servicos(self):
-        self.mostrar_mensagem(
-            "Serviços",
-            (
-                "Nesta área serão disponibilizados histórico, "
-                "relatórios, ajuda e jogos."
-            ),
-        )
+        ServicesView(self)
 
     def abrir_configuracoes(self):
         ConfigView(self)

@@ -135,7 +135,7 @@ class ConfigView(ctk.CTkToplevel):
         self.linha_opcao(
             rede, "Limite do scanner", "Quantidade máxima de portas por varredura",
             lambda pai: ctk.CTkOptionMenu(
-                pai, values=["32", "64", "128", "256"], variable=self.max_portas,
+                pai, values=["32", "64", "128", "256","512","1024"], variable=self.max_portas,
             ),
         )
         self.timeout = ctk.StringVar(value=str(self.dados["timeout_porta"]))

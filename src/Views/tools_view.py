@@ -111,13 +111,13 @@ class ToolsView(ctk.CTkToplevel):
                 "status": "Disponível", "cor_status": VERDE, "acao": self.executar_ping,
             },
             {
-                "nome": "Consulta DNS", "icone": "DNS", "categoria": "Rede",
+                "nome": "ConsultDNS", "icone": "DNS", "categoria": "Rede",
                 "descricao": "Resolve nomes de domínio e apresenta endereços IP.",
                 "explicacao": "Útil para diagnóstico de resolução de nomes e conectividade.",
                 "status": "Disponível", "cor_status": VERDE, "acao": self.executar_dns,
             },
             {
-                "nome": "Scanner de Portas", "icone": "PORT", "categoria": "Rede",
+                "nome": "ScanPort", "icone": "PORT", "categoria": "Rede",
                 "descricao": "Analisa um intervalo controlado de portas TCP.",
                 "explicacao": "Destinado a equipamentos próprios ou ambientes autorizados. O limite é configurável.",
                 "status": "Disponível", "cor_status": VERDE, "acao": self.executar_scanner,
@@ -126,7 +126,7 @@ class ToolsView(ctk.CTkToplevel):
                 "nome": "Nmap", "icone": "NMAP", "categoria": "Auditoria",
                 "descricao": "Executa perfis básicos do Nmap com parâmetros controlados.",
                 "explicacao": "Permite inventário de portas e identificação leve de serviços. Scripts NSE e opções evasivas ficam bloqueados no protótipo.",
-                "status": "Disponível*", "cor_status": VERDE, "acao": self.executar_nmap,
+                "status": "EM DESENVOLVIMENTO*", "cor_status": AMARELO, "acao": self.executar_nmap,
             },
             {
                 "nome": "Scapy - Diagnóstico ICMP", "icone": "SCAPY", "categoria": "Rede",

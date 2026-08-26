@@ -38,10 +38,12 @@ def aplicar_tema_salvo():
 class ToolExecutionView(ctk.CTkToplevel):
     def __init__(self, dashboard, ferramenta):
         super().__init__(dashboard)
+        from src.Controller.servicesController import ServicesController
         aplicar_tema_salvo()
         self.dashboard = dashboard
         self.ferramenta = ferramenta
         self.controller = ToolsController()
+        self.services_controller = ServicesController()
         self.arquivo_selecionado = ""
 
         self.title(f"CiberToolBox - {ferramenta}")
@@ -327,7 +329,15 @@ class ToolExecutionView(ctk.CTkToplevel):
         self.botao_executar.configure(state="disabled", text="Executando...")
         self.status.configure(text="Processando...", text_color=ORANGE)
         threading.Thread(target=self._executar_thread, args=(dados,), daemon=True).start()
-
+    def mostrar_resultado(self, r):
+        self.resultado.delete("1.0", "end")
+        texto = r.saida if r.saida else r.mensagem
+        self.resultado.insert("1.0", texto)
+        self.status.configure(text=r.mensagem, text_color=GREEN if r.sucesso else RED)
+        self.botao_executar.configure(state="normal", text="Executar")
+        self.registrar_no_historico(r)
+        if self.ferramenta == "Gerador de Relatório" and r.sucesso:
+            self.exportar_relatorio(r.saida)
     def _executar_thread(self, dados):
         try:
             f = self.ferramenta
@@ -365,16 +375,136 @@ class ToolExecutionView(ctk.CTkToplevel):
         except Exception as erro:
             mensagem = str(erro)
             self.after(0, lambda: self.mostrar_erro(mensagem))
+    def registrar_no_historico(
+        self,
+        resultado
+        ):
+            try:
+                dados = self.coletar_dados()
 
-    def mostrar_resultado(self, r):
-        self.resultado.delete("1.0", "end")
-        texto = r.saida if r.saida else r.mensagem
-        self.resultado.insert("1.0", texto)
-        self.status.configure(text=r.mensagem, text_color=GREEN if r.sucesso else RED)
-        self.botao_executar.configure(state="normal", text="Executar")
-        if self.ferramenta == "Gerador de Relatório" and r.sucesso:
-            self.exportar_relatorio(r.saida)
+                categoria = self.obter_categoria()
 
+                entrada = self.obter_entrada_historico(
+                    dados
+                )
+
+                self.services_controller.registrar_execucao(
+                    ferramenta=self.ferramenta,
+                    categoria=categoria,
+                    entrada=entrada,
+                    resultado=resultado,
+                )
+
+            except Exception as erro:
+                # O histórico não deve impedir
+                # a ferramenta de funcionar.
+                print(
+                    "Erro ao registrar histórico:",
+                    erro
+                )
+    def obter_categoria(self):
+        categorias = {
+            "Ping": "Rede",
+            "Consulta DNS": "Rede",
+            "Scanner de Portas": "Rede",
+            "Scapy - Diagnóstico ICMP": "Rede",
+
+            "Nmap": "Auditoria",
+            "Análise de Vulnerabilidade Web":
+                "Auditoria",
+
+            "Hash de Texto": "Integridade",
+            "Hash de Arquivo": "Integridade",
+            "Comparar Hashes": "Integridade",
+
+            "Criptografar Arquivo":
+                "Criptografia",
+
+            "Descriptografar Arquivo":
+                "Criptografia",
+
+            "Analisador de Senha":
+                "Credenciais",
+
+            "Informações do Sistema":
+                "Sistema",
+        }
+
+        return categorias.get(
+            self.ferramenta,
+            "Outros"
+        )
+    def obter_entrada_historico(
+        self,
+        dados
+    ):
+        # Nunca registrar senha.
+        if self.ferramenta == "Analisador de Senha":
+            return "[não armazenado]"
+
+        if self.ferramenta in (
+            "Criptografar Arquivo",
+            "Descriptografar Arquivo",
+        ):
+            return dados.get(
+                "arquivo",
+                ""
+            )
+
+        if self.ferramenta == "Ping":
+            return dados.get(
+                "host",
+                ""
+            )
+
+        if self.ferramenta == "Consulta DNS":
+            return dados.get(
+                "host",
+                ""
+            )
+
+        if self.ferramenta == "Scanner de Portas":
+            return (
+                f"{dados.get('host', '')} | "
+                f"{dados.get('inicio', '')}-"
+                f"{dados.get('fim', '')}"
+            )
+
+        if self.ferramenta == "Nmap":
+            return dados.get(
+                "host",
+                ""
+            )
+
+        if (
+            self.ferramenta
+            == "Scapy - Diagnóstico ICMP"
+        ):
+            return dados.get(
+                "host",
+                ""
+            )
+
+        if (
+            self.ferramenta
+            == "Análise de Vulnerabilidade Web"
+        ):
+            return dados.get(
+                "url",
+                ""
+            )
+
+        if self.ferramenta == "Hash de Arquivo":
+            return dados.get(
+                "arquivo",
+                ""
+            )
+
+        # Não salvar o texto do Hash de Texto.
+        if self.ferramenta == "Hash de Texto":
+            return "[texto não armazenado]"
+
+        return ""
     def mostrar_erro(self, erro):
         self.status.configure(text=f"Erro: {erro}", text_color=RED)
         if hasattr(self, "botao_executar"):

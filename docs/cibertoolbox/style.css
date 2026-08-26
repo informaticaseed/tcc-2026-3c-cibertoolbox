@@ -1,0 +1,256 @@
+:root {
+  --ink:#f3f4f6;
+  --muted:#a5aab5;
+  --line:#262a31;
+  --red:#e23b3b;
+  --paper:#090b0f;
+}
+* {
+  box-sizing:border-box;
+}
+html {
+  scroll-behavior:smooth;
+}
+body {
+  margin:0;
+  color:var(--ink);
+  background:radial-gradient(circle at 85% 20%,#341112 0,transparent 25%),var(--paper);
+  font-family:"Manrope",Arial,sans-serif;
+}
+.container {
+  width:min(1120px,calc(100% - 48px));
+  margin-inline:auto;
+}
+.nav {
+  height:88px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid var(--line);
+}
+.brand {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:var(--ink);
+  text-decoration:none;
+  font-size:20px;
+  font-weight:800;
+  letter-spacing:-.8px;
+}
+.brand-mark {
+  display:grid;
+  width:29px;
+  height:29px;
+  place-items:center;
+  color:#fff;
+  background:linear-gradient(135deg,#f05050,#b51620);
+  border-radius:8px;
+  font-family:"DM Mono",monospace;
+  font-size:17px;
+  box-shadow:0 5px 17px #e23b3b4a;
+}
+.nav-link {
+  color:#c4c8d0;
+  text-decoration:none;
+  font-size:14px;
+  font-weight:700;
+  transition:color .2s;
+}
+.nav-link:hover {
+  color:#ff6262;
+}
+.hero {
+  min-height:calc(100vh - 160px);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+  gap:64px;
+  padding:64px 0 72px;
+}
+.eyebrow {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin:0 0 20px;
+  color:#fb5e5e;
+  font:500 12px/1 "DM Mono",monospace;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.eyebrow span {
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#50df8f;
+  box-shadow:0 0 0 4px #50df8f1b;
+}
+h1 {
+  max-width:600px;
+  margin:0;
+  font-size:clamp(40px,4.55vw,66px);
+  line-height:1.08;
+  letter-spacing:-.065em;
+  font-weight:800;
+}
+h1 em {
+  color:#f04d4d;
+  font-style:normal;
+}
+.intro {
+  max-width:485px;
+  margin:25px 0 31px;
+  color:var(--muted);
+  font-size:17px;
+  line-height:1.68;
+}
+.actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.button {
+  display:inline-flex;
+  min-height:52px;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:0 20px;
+  border-radius:9px;
+  text-decoration:none;
+  font-size:14px;
+  font-weight:800;
+  transition:transform .2s,box-shadow .2s,background .2s;
+}
+.button:hover {
+  transform:translateY(-2px);
+}
+.button-primary {
+  color:#fff;
+  background:linear-gradient(135deg,#e74646,#bd2025);
+  box-shadow:0 10px 25px #e23b3b42;
+}
+.button-primary:hover {
+  background:#c8272b;
+  box-shadow:0 13px 27px #e23b3b57;
+}
+.download-icon {
+  font-size:21px;
+}
+.button-secondary {
+  color:#e3e5e9;
+  background:#161a20;
+  border:1px solid #303640;
+}
+.button-secondary:hover {
+  background:#1e232b;
+  border-color:#555c68;
+}
+.support {
+  margin:17px 0 0;
+  color:#858b97;
+  font-size:12px;
+}
+.support span {
+  margin:0 6px;
+  color:#555b66;
+}
+.project-preview {
+  position:relative;
+  margin:0;
+  padding:10px;
+  background:linear-gradient(145deg,#343840,#13161b 48%,#732324);
+  border:1px solid #3a3f48;
+  border-radius:18px;
+  box-shadow:0 28px 58px #0000008c,0 0 45px #dc30311c;
+  transform:rotate(-1.5deg);
+}
+.project-preview::before {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  width:62%;
+  height:62%;
+  right:-12%;
+  bottom:-12%;
+  background:#c6252b;
+  opacity:.15;
+  filter:blur(54px);
+}
+.project-preview img {
+  display:block;
+  width:100%;
+  aspect-ratio:1.92/1;
+  object-fit:cover;
+  object-position:center;
+  border-radius:10px;
+}
+.project-preview figcaption {
+  padding:10px 4px 2px;
+  color:#aeb3be;
+  font:11px "DM Mono",monospace;
+}
+.footer {
+  display:flex;
+  justify-content:space-between;
+  padding:21px 0 27px;
+  color:#818794;
+  font-size:12px;
+  border-top:1px solid var(--line);
+}
+@media (max-width:800px) {
+  .hero {
+    grid-template-columns:1fr;
+    gap:43px;
+    padding-top:42px;
+  }
+  .hero-copy {
+    text-align:center;
+  }
+  .eyebrow,.actions {
+    justify-content:center;
+  }
+  .intro {
+    margin-inline:auto;
+  }
+  .project-preview {
+    width:94%;
+    max-width:570px;
+    margin:0 auto;
+  }
+  .footer {
+    margin-top:20px;
+  }
+}
+@media (max-width:480px) {
+  .container {
+    width:min(100% - 32px,1120px);
+  }
+  .nav {
+    height:74px;
+  }
+  .nav-link {
+    font-size:12px;
+  }
+  .hero {
+    padding:40px 0 50px;
+  }
+  .intro {
+    font-size:16px;
+  }
+  .actions {
+    flex-direction:column;
+  }
+  .button {
+    width:100%;
+  }
+  .project-preview {
+    width:100%;
+    padding:7px;
+    transform:none;
+  }
+  .footer {
+    flex-direction:column;
+    gap:8px;
+  }
+}

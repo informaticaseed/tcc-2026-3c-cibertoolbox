@@ -2,3 +2,5 @@ customtkinter
 pillow
 cryptography
 scapy
+pygame
+peewee

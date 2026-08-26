@@ -222,7 +222,7 @@ def main(começar,colidiu,PONTOS,ultimo_cano,cano_passou):
                     som_passar.play()
                     cano_passou = False         
         #sistema de muda de dia para noite
-        if PONTOS >= 100 :
+        if PONTOS >= 5 :
             Background = pygame.image.load(os.path.join(Diretorio_Imagens, "background-night.png"))
         else:
             Background = pygame.image.load(os.path.join(Diretorio_Imagens, "background-day.png"))

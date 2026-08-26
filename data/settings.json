@@ -2,8 +2,8 @@
     "escala_interface": 1.0,
     "animacoes": true,
     "abrir_maximizado": true,
-    "max_portas_scan": 128,
-    "timeout_porta": 0.25,
-    "cor_destaque": "Azul",
-    "tema_fundo": "Escuro"
+    "max_portas_scan": 1024,
+    "timeout_porta": 0.1,
+    "cor_destaque": "Roxo",
+    "tema_fundo": "Preto"
 }
