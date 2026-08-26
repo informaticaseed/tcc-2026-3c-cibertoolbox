@@ -19,9 +19,9 @@
 
 | Integrante | Cumpriu? | Evidência (commit/Issue/PR) | Observação |
 |-----------|----------|----------------------------|------------|
-| (nome 1) | ✅ / ⚠️ / ❌ | | |
-| (nome 2) | ✅ / ⚠️ / ❌ | | |
-| (nome 3) | ✅ / ⚠️ / ❌ | | |
+| (Arthur) | ✅  | | |
+| (Davi) | ✅| | |
+| (Vinícius) | ✅  |  | |
 
 **Nota da quinzena:** _____ / 4,0
 **Observações gerais:**
@@ -30,7 +30,7 @@
 
 ## Quinzena 2 — 10/08 a 22/08
 
-### Compromissos assumidos em 11/08
+### Compromissos assumidos em 10/08
 
 | Integrante | O que se comprometeu a fazer |
 |-----------|------------------------------|
@@ -43,9 +43,9 @@
 
 | Integrante | Cumpriu? | Evidência (commit/Issue/PR) | Observação |
 |-----------|----------|----------------------------|------------|
-| (nome 1) | ✅ / ⚠️ / ❌ | | |
-| (nome 2) | ✅ / ⚠️ / ❌ | | |
-| (nome 3) | ✅ / ⚠️ / ❌ | | |
+| Arthur | ✅ / ⚠️ / ❌ | | |
+|  Davi | ✅ / ⚠️ / ❌ | | |
+| Vinícius | ✅ / ⚠️ / ❌ | | |
 
 **Nota da quinzena:** _____ / 4,0
 **Observações gerais:**
