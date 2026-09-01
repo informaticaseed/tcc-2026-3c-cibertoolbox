@@ -54,13 +54,14 @@
 
 ## Quinzena 3 — 24/08 a 05/09
 
-### Compromissos assumidos em 24/08
+### Compromissos assumidos em 01/09
 
 | Integrante | O que se comprometeu a fazer |
 |-----------|------------------------------|
-| (nome 1) | |
-| (nome 2) | |
-| (nome 3) | |
+| Arthur | Pequenos ajutes, debugar e mover o relatório, fazer inscrição da semana acadêmica|
+| Davi |Estudar para qualificação e slide|
+| Vinícius | Finalizar a escrita do TCC, preencher as informações iniciais da capa, colocar as imagens do programa, diagrama de caso de uso, requisitos, e tópicos pendentes|
+| Natan | Criar tabelas: históricos e login, diagrama de caso e revisão de documentação|
 
 ### Verificação em 05/09
 
