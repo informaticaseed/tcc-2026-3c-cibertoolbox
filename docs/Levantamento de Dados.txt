@@ -1,0 +1,42 @@
+Teste
+
+Escolham algumas tarefas:
+
+Tarefa 1:
+Realizar um Ping.
+
+Tarefa 2:
+Consultar DNS.
+
+Tarefa 3:
+Calcular SHA-256 de um arquivo.
+
+Tarefa 4:
+Verificar portas de localhost.
+
+Tarefa 5:
+Analisar uma URL.
+
+Depois vocês podem pedir para usuários executarem essas tarefas.
+
+Registrar:
+
+tempo
+erros
+dificuldade
+conclusão da tarefa
+opinião
+
+Existe uma baixa disponibilidade de softwares open-source, portáteis e multi-tools voltados à cibersegurança, especialmente aqueles que integram diferentes funcionalidades em uma única aplicação.
+
+Kali Linux → open-source e possui muitas ferramentas, mas é uma distribuição Linux, não necessariamente uma aplicação portátil para Windows.
+
+Nmap → open-source e pode ser portátil, mas é uma ferramenta específica, não uma multi-tool.
+
+Wireshark → open-source e possui versão para Windows, mas é focado em análise de tráfego.
+
+https://github.com/rmusser01/tldw_server
+Formulários
+https://forms.gle/zYU2F9ChoGDx8K9e8
+
+
