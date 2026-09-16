@@ -1,6 +1,6 @@
 from src.Models.tool_result import ToolResult
 from src.Models.settings_model import SettingsModel
-
+from src.Servicos.Ferramentas.Whois import WhoisTool
 from src.Servicos.Ferramentas.Ping_tool import PingTool
 from src.Servicos.Ferramentas.Dns_tool import DnsTool
 from src.Servicos.Ferramentas.PortScan import PortScanTool
@@ -10,7 +10,7 @@ from src.Servicos.Ferramentas.System_tool import SystemTool
 from src.Servicos.Ferramentas.Report_tool import ReportTool
 
 from src.Servicos.Ferramentas.Crypto_tool import CryptoTool
-from src.Servicos.Ferramentas.Nmap_tool import NmapTool
+#from src.Servicos.Ferramentas.Nmap_tool import NmapTool
 from src.Servicos.Ferramentas.Vulnerability_tool import VulnerabilityTool
 from src.Servicos.Ferramentas.Scapy_tool import ScapyTool
 
@@ -24,6 +24,7 @@ class ToolsController:
 
     def __init__(self):
         # Ferramentas básicas
+        self.whois_tool = WhoisTool()
         self.ping_tool = PingTool()
         self.dns_tool = DnsTool()
         self.port_tool = PortScanTool()
@@ -34,7 +35,7 @@ class ToolsController:
 
         # Ferramentas adicionais
         self.crypto_tool = CryptoTool()
-        self.nmap_tool = NmapTool()
+        #self.nmap_tool = NmapTool()
         self.vulnerability_tool = VulnerabilityTool()
         self.scapy_tool = ScapyTool()
 
@@ -55,6 +56,23 @@ class ToolsController:
             )
 
         return self.ping_tool.executar(
+            host,
+            parametros
+        )
+    # ========================================================
+    # Whois
+    # ========================================================
+
+    def executar_Whois(self, host, parametros=""):
+        host = host.strip()
+
+        if not host:
+            return ToolResult(
+                False,
+                "Informe um host ou endereço IP."
+            )
+
+        return self.Whois.executar(
             host,
             parametros
         )
@@ -297,7 +315,7 @@ class ToolsController:
     # ========================================================
     # NMAP
     # ========================================================
-
+    """
     def executar_nmap(
         self,
         alvo,
@@ -315,7 +333,7 @@ class ToolsController:
             alvo,
             parametros
         )
-
+"""
     # ========================================================
     # ANÁLISE WEB
     # ========================================================

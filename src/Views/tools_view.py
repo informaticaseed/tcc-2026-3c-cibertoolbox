@@ -111,6 +111,12 @@ class ToolsView(ctk.CTkToplevel):
                 "status": "Disponível", "cor_status": VERDE, "acao": self.executar_ping,
             },
             {
+                "nome": "Whois", "icone": "Whois", "categoria": "Rede",
+                "descricao": "Pesquisa aprimorada sobre o responsavel de um determinado dominio.",
+                "explicacao": "Destinado a equipamentos próprios ou ambientes autorizados. O limite é configurável.",
+                "status": "EM DESENVOLVIMENTO", "cor_status": AMARELO, "acao": self.executar_whois,
+            },
+            {
                 "nome": "ConsultDNS", "icone": "DNS", "categoria": "Rede",
                 "descricao": "Resolve nomes de domínio e apresenta endereços IP.",
                 "explicacao": "Útil para diagnóstico de resolução de nomes e conectividade.",
@@ -823,7 +829,8 @@ class ToolsView(ctk.CTkToplevel):
 
     def executar_ping(self):
         self.abrir_ferramenta("Ping")
-
+    def executar_whois(self):
+        self.abrir_ferramenta("Whois")
     def executar_dns(self):
         self.abrir_ferramenta("Consulta DNS")
 
@@ -849,7 +856,7 @@ class ToolsView(ctk.CTkToplevel):
         self.abrir_ferramenta("Gerador de Relatório")
 
     def executar_nmap(self):
-        self.abrir_ferramenta("Nmap")
+        pass
 
     def executar_scapy(self):
         self.abrir_ferramenta("Scapy - Diagnóstico ICMP")

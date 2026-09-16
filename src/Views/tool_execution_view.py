@@ -191,7 +191,16 @@ class ToolExecutionView(ctk.CTkToplevel):
                 justify="left",
                 wraplength=330,
             ).pack(anchor="w", padx=24, pady=8)
-
+        if f == "Whois":
+            self.host = self.entrada("Host ou IP, ex.: 127.0.0.1")
+            self.parametros = self.entrada("Parâmetros opcionais, ex.: -a ou -A ")
+            ctk.CTkLabel(
+                self.painel_entrada,
+                text=("Os parâmetros são validados antes da execução."),
+                text_color=MUTED,
+                justify="left",
+                wraplength=330,
+            ).pack(anchor="w", padx=24, pady=8)
         elif f == "Consulta DNS":
             self.host = self.entrada("Domínio, ex.: example.com")
 
@@ -292,14 +301,16 @@ class ToolExecutionView(ctk.CTkToplevel):
 
     def coletar_dados(self):
         f = self.ferramenta
+        if f == "Whois":
+            return {"host": self.host.get(), "parametros": self.parametros.get()}
         if f == "Ping":
             return {"host": self.host.get(), "parametros": self.parametros.get()}
         if f == "Consulta DNS":
             return {"host": self.host.get()}
         if f == "Scanner de Portas":
             return {"host": self.host.get(), "inicio": self.porta_inicio.get(), "fim": self.porta_fim.get()}
-        if f == "Nmap":
-            return {"host": self.host.get(), "parametros": self.parametros.get()}
+       #if f == "Nmap":
+            #return {"host": self.host.get(), "parametros": self.parametros.get()}
         if f == "Scapy - Diagnóstico ICMP":
             return {"host": self.host.get()}
         if f == "Análise de Vulnerabilidade Web":
@@ -341,6 +352,8 @@ class ToolExecutionView(ctk.CTkToplevel):
     def _executar_thread(self, dados):
         try:
             f = self.ferramenta
+            if f == "Whois":
+                r = self.controller.executar_Whois(dados["host"], dados["parametros"])
             if f == "Ping":
                 r = self.controller.executar_ping(dados["host"], dados["parametros"])
             elif f == "Consulta DNS":
@@ -348,7 +361,8 @@ class ToolExecutionView(ctk.CTkToplevel):
             elif f == "Scanner de Portas":
                 r = self.controller.executar_port_scan(dados["host"], dados["inicio"], dados["fim"])
             elif f == "Nmap":
-                r = self.controller.executar_nmap(dados["host"], dados["parametros"])
+                #r = self.controller.executar_nmap(dados["host"], dados["parametros"])
+                pass
             elif f == "Scapy - Diagnóstico ICMP":
                 r = self.controller.executar_scapy(dados["host"])
             elif f == "Análise de Vulnerabilidade Web":
@@ -405,6 +419,7 @@ class ToolExecutionView(ctk.CTkToplevel):
     def obter_categoria(self):
         categorias = {
             "Ping": "Rede",
+            "Whois": "Rede",
             "Consulta DNS": "Rede",
             "Scanner de Portas": "Rede",
             "Scapy - Diagnóstico ICMP": "Rede",
@@ -450,7 +465,11 @@ class ToolExecutionView(ctk.CTkToplevel):
                 "arquivo",
                 ""
             )
-
+        if self.ferramenta == "Whois":
+            return dados.get(
+                "host",
+                ""
+            )
         if self.ferramenta == "Ping":
             return dados.get(
                 "host",
