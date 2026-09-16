@@ -10,7 +10,7 @@
 
 (Descreva em 2-4 frases o que o MVP precisa entregar)
 
----
+--- 
 
 ## ✅ Funcionalidades do MVP
 
