@@ -4,6 +4,6 @@
     "abrir_maximizado": true,
     "max_portas_scan": 1024,
     "timeout_porta": 0.1,
-    "cor_destaque": "Roxo",
+    "cor_destaque": "Vermelho",
     "tema_fundo": "Preto"
 }
