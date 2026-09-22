@@ -13,3 +13,4 @@
 - Analisador de senha.
 - Informações do sistema.
 - Gerador de relatório.
+- Who Is
