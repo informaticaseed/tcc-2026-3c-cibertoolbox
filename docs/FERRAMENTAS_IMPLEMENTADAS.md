@@ -19,7 +19,3 @@
 As bibliotecas Python ficam em `requirements.txt`.
 
 O Nmap é um programa externo e precisa estar instalado no sistema e disponível no PATH. Em Windows, o Scapy pode precisar do Npcap e de privilégios adequados para envio de pacotes.
-
-## Uso responsável
-
-Ferramentas de rede e auditoria devem ser usadas em máquinas próprias, laboratórios ou ambientes com autorização expressa. A versão do Nmap bloqueia scripts NSE, spoofing e opções evasivas para manter o escopo defensivo/educacional do projeto.
