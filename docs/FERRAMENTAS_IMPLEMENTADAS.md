@@ -13,9 +13,3 @@
 - Analisador de senha.
 - Informações do sistema.
 - Gerador de relatório.
-
-## Dependências
-
-As bibliotecas Python ficam em `requirements.txt`.
-
-O Nmap é um programa externo e precisa estar instalado no sistema e disponível no PATH. Em Windows, o Scapy pode precisar do Npcap e de privilégios adequados para envio de pacotes.
